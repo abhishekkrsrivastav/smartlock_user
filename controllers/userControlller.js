@@ -251,12 +251,12 @@ export const logoutUser = async (req, res) => {
             });
         }
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const userType = decoded.userType;
+        // const userType = decoded.userType;
         await db.query("INSERT INTO token_blacklist (token) VALUES (?)", [token]);
         res.status(200).send({
             success: true,
             message: "Logout successfully",
-            userType: `${userType}`
+            // userType: `${userType}`
         })
     } catch (error) {
         console.log(error);

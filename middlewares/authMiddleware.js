@@ -11,7 +11,7 @@ export const verifyToken = async (req, res, next) => {
     const [blacklisted] = await db.query("SELECT * FROM token_blacklist WHERE token = ?", [token]);
 
     if (blacklisted.length > 0) {
-        return res.status(403).send({ success: false, message: "please login again" });
+        return res.status(403).send({ success: false, message: "Please login again" });
     }
 
     try {
@@ -21,7 +21,7 @@ export const verifyToken = async (req, res, next) => {
 
         const [blacklisted] = await db.query("SELECT * FROM token_blacklist WHERE token = ?", [token]);
         if (blacklisted.length > 0) {
-            return res.status(403).send({ success: false, message: "Token is blacklisted, please login again" });
+            return res.status(403).send({ success: false, message: "Please login again" });
         }
         
         next();
