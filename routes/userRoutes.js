@@ -1,11 +1,12 @@
 import express from 'express';
-import {getUser, createUser, loginUser} from '../controllers/userControlller.js';
+import {getUser, createUser, loginUser, logoutUser} from '../controllers/userControlller.js';
+import { verifyToken } from '../middlewares/authMiddleware.js';
 
 const router=express.Router();
 
 // get all users || GET
 
-router.get('/getall', getUser)
+router.get("/getall", getUser)
 
 // get user by id
 // router.get("/get/:id", getUserById);
@@ -14,7 +15,10 @@ router.get('/getall', getUser)
 router.post("/create", createUser);
 
 // login user || post
-router.post("/login", loginUser)
+router.post("/login", loginUser);
+
+// logout user || post
+router.post("/logout", verifyToken, logoutUser);
 
 // update user
 // router.put("/update/:id", updateUser);

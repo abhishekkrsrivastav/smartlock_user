@@ -74,8 +74,8 @@ export const createUser = async (req, res) => {
             })
         }
 
-         //  Check if user is trying to register as Admin
-         if (userType === '1') {
+        //  Check if user is trying to register as Admin
+        if (userType === '1') {
             return res.status(403).send({
                 success: false,
                 message: 'Only predefined admin email can register as Admin'
@@ -134,11 +134,11 @@ export const loginUser = async (req, res) => {
             });
         }
 
-         
+
 
 
         // Check if all fields are provided
-        if (!email || !password ) {
+        if (!email || !password) {
             return res.status(404).send({
                 success: false,
                 message: 'Please provide all fields',
@@ -158,8 +158,8 @@ export const loginUser = async (req, res) => {
             });
         }
 
-         //  Check if user is trying to login as Admin
-         if (user[0].userType === '1') {
+        //  Check if user is trying to login as Admin
+        if (user[0].userType === '1') {
             return res.status(403).send({
                 success: false,
                 message: 'Unauthorized Admin login attempt'
@@ -237,3 +237,35 @@ export const loginUser = async (req, res) => {
 //     }
 
 // }
+
+
+// logout
+
+export const logoutUser = async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) {
+            return res.status(401).send({
+                success: false,
+                message: "No token provided"
+            });
+        }
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userType = decoded.userType;
+        await db.query("INSERT INTO token_blacklist (token) VALUES (?)", [token]);
+        res.status(200).send({
+            success: true,
+            message: "Logout successfully",
+            userType: `${userType}`
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            success: false,
+            message: "Error in logout Api",
+            error
+        })
+
+    }
+}
+

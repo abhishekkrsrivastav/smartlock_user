@@ -1,15 +1,13 @@
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import morgan from 'morgan';
 import db from './config/db.js';
 import userRoutes from './routes/userRoutes.js'
-// import keywordRoutes from './routes/keywordRoutes.js'
+import keywordRoutes from './routes/keywordRoutes.js'
 
 
 const app = express();
-// dotenv
-dotenv.config();
+
 
 // middleware
 app.use(morgan("dev"));
@@ -21,7 +19,7 @@ app.use(express.json());
 app.use('/api/user', userRoutes);
 
 // routes for keywords
-// app.use('/api', keywordRoutes)
+app.use('/api', keywordRoutes)
 
 
 
