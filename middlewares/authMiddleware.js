@@ -29,3 +29,14 @@ export const verifyToken = async (req, res, next) => {
         return res.status(401).send({ success: false, message: "Invalid token" });
     }
 };
+
+ 
+// export function verifyAdmin(req, res, next) {
+//     if (req.session && req.session.user) {
+//         next(); // Admin hai to aage badho
+//     } else {
+//         res.status(403).send("Access Denied! Only Admin can access this page."); // Unauthorized user ke liye error
+//     }
+// }
+
+

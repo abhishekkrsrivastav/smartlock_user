@@ -133,10 +133,6 @@ export const loginUser = async (req, res) => {
                 message: 'Please provide email and password',
             });
         }
-
-
-
-
         // Check if all fields are provided
         if (!email || !password) {
             return res.status(404).send({
