@@ -1,11 +1,14 @@
 import express from "express";
-import { addUser, getUsers, deleteUser } from "../controllers/adminController.js";
+import { loginAdmin, addVendor, getVendor, deleteVendor, UpdateVendor } from "../controllers/adminController.js";
 import { verifyToken } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-router.post("/add-user", verifyToken, addUser);
-router.get("/get-users", verifyToken, getUsers);
-router.delete("/delete-user/:id", verifyToken, deleteUser);
+
+router.put("/login", loginAdmin);
+router.post("/add-vendor", verifyToken, addVendor);
+router.get("/get-vendor", verifyToken, getVendor);
+router.delete("/delete-vendor/:id", verifyToken, deleteVendor);
+router.put("/edit-vendor/:id", verifyToken, UpdateVendor);
 
 export default router;
