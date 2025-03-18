@@ -5,7 +5,7 @@ import { verifyToken } from "../middlewares/authMiddleware.js";
 const router = express.Router();
 
 
-router.put("/login", loginAdmin);
+router.post("/login", loginAdmin);
 router.post("/add-vendor", verifyToken, addVendor);
 router.get("/get-vendor", verifyToken, getVendor);
 router.delete("/delete-vendor/:id", verifyToken, deleteVendor);
