@@ -6,7 +6,7 @@ import userRoutes from './routes/userRoutes.js'
 import keywordRoutes from './routes/keywordRoutes.js'
 import adminRoutes from './routes/adminRoutes.js'
 import navbarRoutes from './routes/navbarRoutes.js'
-
+import uploadRoutes from "./routes/uploadRoutes.js";
 
 const app = express();
 
@@ -17,8 +17,8 @@ app.use(morgan("dev"));
 app.use(cors());
 app.use(express.json());
 
-
-
+ 
+app.use("/api", uploadRoutes);
 
 // routes for user
 app.use('/api/user', userRoutes);
