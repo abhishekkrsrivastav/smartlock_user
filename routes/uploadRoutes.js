@@ -3,7 +3,8 @@ import { getUserByImagePath, saveImagePath } from "../controllers/uploadControll
 
 const router = express.Router();
 router.post("/save-path", saveImagePath);
-router.get("/get-user-by-image", getUserByImagePath)
+// router.get("/get-user-by-image", getUserByImagePath)
+router.get("/get-image", getUserByImagePath)
 
 export default router;
 

@@ -43,27 +43,46 @@ export const saveImagePath = async (req, res) => {
 
 //  get api for image_path
 
+// export const getUserByImagePath = async (req, res) => {
+//   try {
+//     const { image_path } = req.query;
+//     if (!image_path) {
+//       return res.status(400).json({ error: "image_path is required" });
+//     }
+//     const [imageData] = await db.query(`select user_id from user_images where image_path=?`, [image_path]);
+
+//     if (imageData.length === 0) {
+//       return res.status(404).json({ error: "No image found" });
+//     }
+//     const userID = imageData[0].user_id;
+
+//     const [userData] = await db.query(`select username,status_id,age_id,gender_id from users where id=?`, [userID]);
+//     if (userData.length === 0) {
+//       return res.status(404).json({ error: "No user found" });
+//     }
+//     res.status(200).json({
+//       message: "user matched successfully",
+//       user: userData[0],
+//       image_path
+//     })
+
+//   } catch (error) {
+//     console.error('Match error:', error);
+//     res.status(500).json({ error: 'Server error' });
+//   }
+// }
+
+
 export const getUserByImagePath = async (req, res) => {
   try {
-    const { image_path } = req.query;
-    if (!image_path) {
-      return res.status(400).json({ error: "image_path is required" });
-    }
-    const [imageData] = await db.query(`select user_id from user_images where image_path=?`, [image_path]);
+    
+    const [imageData] = await db.query(`select image_path from user_images`);
 
-    if (imageData.length === 0) {
-      return res.status(404).json({ error: "No image found" });
-    }
-    const userID = imageData[0].user_id;
-
-    const [userData] = await db.query(`select username,status_id,age_id,gender_id from users where id=?`, [userID]);
-    if (userData.length === 0) {
-      return res.status(404).json({ error: "No user found" });
-    }
+     
     res.status(200).json({
-      message: "user matched successfully",
-      user: userData[0],
-      image_path
+      message: "image path successfully",
+      image_path: imageData,
+      
     })
 
   } catch (error) {
@@ -71,3 +90,4 @@ export const getUserByImagePath = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 }
+
