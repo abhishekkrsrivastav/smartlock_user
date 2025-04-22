@@ -2,12 +2,12 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import db from './config/db.js';
-import userRoutes from './routes/userRoutes.js'
+// import userRoutes from './routes/userRoutes.js'
 import keywordRoutes from './routes/keywordRoutes.js'
 import adminRoutes from './routes/adminRoutes.js'
 import navbarRoutes from './routes/navbarRoutes.js'
 import uploadRoutes from "./routes/uploadRoutes.js";
-
+import loginRoute from './routes/loginRoute.js'
 const app = express();
 
 
@@ -17,13 +17,17 @@ app.use(morgan("dev"));
 app.use(cors());
 app.use(express.json());
 
- 
+
+// api for smartlock
+app.use("", loginRoute)
+
+// api for face-recognisation
 app.use("/api", uploadRoutes);
 
 // routes for user
-app.use('/api/user', userRoutes);
+// app.use('/api/user', userRoutes);
 
-// routes for keywords
+// routes for voice command
 app.use('/api', keywordRoutes)
 
 // routes for admin || xrda3 panel
