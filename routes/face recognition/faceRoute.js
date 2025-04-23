@@ -1,5 +1,6 @@
 import express from "express";
-import { getImage, getUserByImagePath, saveImagePath } from "../controllers/uploadController.js";
+import { getImage, getUserByImagePath, saveImagePath } from "../../controllers/face recognition/faceController.js";
+ 
 
 const router = express.Router();
 router.post("/save-path", saveImagePath);

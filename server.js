@@ -2,12 +2,13 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import db from './config/db.js';
-// import userRoutes from './routes/userRoutes.js'
-import keywordRoutes from './routes/keywordRoutes.js'
 import adminRoutes from './routes/adminRoutes.js'
-import navbarRoutes from './routes/navbarRoutes.js'
-import uploadRoutes from "./routes/uploadRoutes.js";
-import loginRoute from './routes/loginRoute.js'
+import faceRoute from './routes/face recognition/faceRoute.js'
+import smartLockRoute from './routes/smartlock/smartLockRoute.js'
+import voiceRoute from './routes/voice command/voiceRoute.js';
+
+
+
 const app = express();
 
 
@@ -19,22 +20,22 @@ app.use(express.json());
 
 
 // api for smartlock
-app.use("", loginRoute)
+app.use("", smartLockRoute)
+
 
 // api for face-recognisation
-app.use("/api", uploadRoutes);
+app.use("/api", faceRoute);
 
 // routes for user
 // app.use('/api/user', userRoutes);
 
 // routes for voice command
-app.use('/api', keywordRoutes)
+app.use('/api', voiceRoute)
 
 // routes for admin || xrda3 panel
 app.use("/api/admin", adminRoutes);
 
-// routes for noon backend
-app.use('/noon', navbarRoutes);
+ 
 
 // port
 const PORT = process.env.PORT || 8888;

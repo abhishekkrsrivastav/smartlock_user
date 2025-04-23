@@ -1,5 +1,5 @@
 import express from 'express';
-import { getResponse, askKeyword} from '../controllers/keywordController.js';
+import { getResponse, askKeyword} from '../../controllers/voice command/voiceController.js';
 
 const router = express.Router();
 

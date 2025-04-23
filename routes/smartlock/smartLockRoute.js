@@ -1,8 +1,10 @@
 import express from 'express';
-import { login } from '../controllers/loginController.js';
+import { create, login } from '../../controllers/smartLock/smartLockController.js';
+
 
 const router = express.Router();
 
 router.post("/login", login);
+router.post("/create", create);
 
 export default router;
