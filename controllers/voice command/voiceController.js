@@ -36,7 +36,7 @@ export const askKeyword = async (req, res) => {
     }
 }
 
- 
+
 
 export const getResponse = async (req, res) => {
     try {
@@ -68,10 +68,49 @@ export const getResponse = async (req, res) => {
 
     }
 
-
-
 }
 
+// save sentence in db
+
+export const saveSentence = async (req, res) => {
+    try {
+        const { sentence } = req.body;
+        if (!sentence) {
+            return res.status(400).json({
+                success: false,
+                message: "Sentence is required"
+            })
+        }
+
+        // const words = sentence.split(" ");
+        // const keyword = words.find(w => /^[A-Z]/.test(w)) || words[0];
+
+        const [result] = await db.query(`insert into save_sentence(sentence) values (?)`, [sentence]);
+
+        // const [result] = await db.query(`select Question,Response from keyword_view where keyword=?`, [keyword]);
+
+        // if (result.length === 0) {
+        //     return res.status(404).json({
+        //         success: false,
+        //         message: "No data found for this keyword" 
+        //     })
+        // }
+
+        res.json({
+            success: true,
+            message: "Sentence saved successfully",
+            sentence: sentence,
+            insertId: result.insertId
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            success: false,
+            message: 'Error in API',
+            error
+        })
+    }
+}
 
 
 
