@@ -125,7 +125,7 @@ export const getImage = async (req, res) => {
     res.status(200).json({
       message: "image path successfully",
       image_path: imageData,
-      user_id: imageData
+      // user_id: imageData
     })
 
   } catch (error) {
