@@ -64,13 +64,14 @@ export const saveImagePath = async (req, res) => {
       userId = insertUser.insertId;
     }
 
-    // Store image path(s)
-    for (const imagePath of image_path) {
-      await db.query(
-        "INSERT INTO user_images (user_id, image_path) VALUES (?, ?)",
-        [userId, imagePath]
-      );
-    }
+    // Convert image_path to JSON format (array)
+    const imagePathsJSON = JSON.stringify(image_path); // Convert to JSON string if it's not already
+
+    // Store image paths in user_images table
+    await db.query(
+      "INSERT INTO user_images (user_id, image_path) VALUES (?, ?)",
+      [userId, imagePathsJSON]
+    );
 
     res.status(200).json({
       message: "Image paths saved successfully",
