@@ -76,13 +76,13 @@ export const getUserByImagePath = async (req, res) => {
 export const getImage = async (req, res) => {
   try {
 
-    const [imageData] = await db.query(`select image_path from user_images`);
+    const [imageData] = await db.query(`select image_path,user_id from user_images`);
 
 
     res.status(200).json({
       message: "image path successfully",
       image_path: imageData,
-
+      user_id: imageData
     })
 
   } catch (error) {
