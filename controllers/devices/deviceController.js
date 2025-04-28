@@ -4,19 +4,19 @@ import db from '../../config/db.js';
 export const addDevice = async (req, res) => {
     try {
         const { deviceCode, deviceName, assignedUserEmail } = req.body;
- 
+
         if (!deviceCode || !deviceName || !assignedUserEmail) {
             return res.status(400).json({ error: "Missing required fields" });
         }
 
-      
+
         const [existing] = await db.query("SELECT id FROM user_data WHERE email = ?", [assignedUserEmail]);
 
         if (existing.length === 0) {
             return res.status(404).json({ error: "User not found" });
         }
 
-        
+
         const [result] = await db.query(
             `INSERT INTO devices (deviceCode, deviceName, assignedUserEmail) VALUES (?, ?, ?)`,
             [deviceCode, deviceName, assignedUserEmail]
@@ -38,3 +38,24 @@ export const addDevice = async (req, res) => {
     }
 };
 
+// get data of device
+export const getDevice = async (req, res) => {
+    try {
+        const [deviceData] = await db.query(`SELECT * FROM Device`);
+
+        if (deviceData.length === 0) {
+            return res.status(404).json({
+                message: "No devices found"
+            });
+        }
+
+        res.status(200).json({
+            message: "Devices fetched successfully",
+            devices: deviceData
+        });
+
+    } catch (error) {
+        console.error('Error fetching devices:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
