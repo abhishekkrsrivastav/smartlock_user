@@ -1,4 +1,5 @@
- 
+import db from '../../config/db.js';
+
 // Adding device to user
 export const addDevice = async (req, res) => {
     try {
