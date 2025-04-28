@@ -41,7 +41,7 @@ export const addDevice = async (req, res) => {
 // get data of device
 export const getDevice = async (req, res) => {
     try {
-        const [deviceData] = await db.query(`SELECT * FROM Device`);
+        const [deviceData] = await db.query(`SELECT * FROM devices`);
 
         if (deviceData.length === 0) {
             return res.status(404).json({
@@ -56,6 +56,6 @@ export const getDevice = async (req, res) => {
 
     } catch (error) {
         console.error('Error fetching devices:', error);
-        res.status(500).json({ error: 'Server error' });
+        res.status(500).json({ error: 'Server error', details: error.message });
     }
 };
