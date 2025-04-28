@@ -41,14 +41,13 @@ import db from '../../config/db.js';
 //   }
 // };
 
-//  get api for image_path
-
+ 
 export const saveImagePath = async (req, res) => {
   try {
-    const { username, status_id, age_id, gender_id, image_paths } = req.body;
+    const { username, status_id, age_id, gender_id, image_path } = req.body;
 
-    if (!username || !status_id || !age_id || !gender_id || !image_paths || !Array.isArray(image_paths)) {
-      return res.status(400).json({ error: "Missing required fields or invalid image paths" });
+    if (!username || !status_id || !age_id || !gender_id || !image_path) {
+      return res.status(400).json({ error: "Missing required fields" });
     }
 
     // Check if user exists
@@ -65,8 +64,8 @@ export const saveImagePath = async (req, res) => {
       userId = insertUser.insertId;
     }
 
-    // Insert each image path into separate rows in user_images table
-    for (let imagePath of image_paths) {
+    // Store image path(s)
+    for (const imagePath of image_path) {
       await db.query(
         "INSERT INTO user_images (user_id, image_path) VALUES (?, ?)",
         [userId, imagePath]
@@ -76,13 +75,13 @@ export const saveImagePath = async (req, res) => {
     res.status(200).json({
       message: "Image paths saved successfully",
       user_id: userId,
-      paths_stored: image_paths,
     });
   } catch (error) {
-    console.error("Save path error:", error);
-    res.status(500).json({ error: "Server error" });
+    console.error("Error in saveImagePath:", error); // Log the error for debugging
+    res.status(500).json({ error: "Server error", details: error.message });
   }
 };
+
 
 
 
