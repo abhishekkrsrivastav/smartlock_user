@@ -6,7 +6,7 @@ import adminRoutes from './routes/adminRoutes.js'
 import faceRoute from './routes/face recognition/faceRoute.js'
 import smartLockRoute from './routes/smartlock/smartLockRoute.js'
 import voiceRoute from './routes/voice command/voiceRoute.js';
-
+import deviceRoute from './routes/Devices/deviceRoute.js'
 
 
 const app = express();
@@ -22,6 +22,8 @@ app.use(express.json());
 // api for smartlock
 app.use("", smartLockRoute)
 
+// api for devices
+app.use("", deviceRoute)
 
 // api for face-recognisation
 app.use("/api", faceRoute);
