@@ -59,3 +59,37 @@ export const getDevice = async (req, res) => {
         res.status(500).json({ error: 'Server error', details: error.message });
     }
 };
+
+
+// delete device
+export const deleteDevice = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        await db.query(`DELETE FROM devices WHERE id = ?`, [id]);
+
+        res.status(200).json({ message: "Device deleted successfully" });
+    } catch (error) {
+        console.error('Error deleting device:', error);
+        res.status(500).json({ error: 'Server error', details: error.message });
+    }
+}
+
+// update device
+
+export const editDevice = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { deviceCode, deviceName, assignedUserEmail } = req.body;
+
+        await db.query(
+            `UPDATE devices SET deviceCode = ?, deviceName = ?, assignedUserEmail = ? WHERE id = ?`,
+            [deviceCode, deviceName, assignedUserEmail, id]
+        );
+
+        res.status(200).json({ message: "Device updated successfully" });
+    } catch (error) {
+        console.error('Error updating device:', error);
+        res.status(500).json({ error: 'Server error', details: error.message });
+    }
+}
