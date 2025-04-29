@@ -8,8 +8,8 @@ import smartLockRoute from './routes/smartlock/smartLockRoute.js'
 import voiceRoute from './routes/voice command/voiceRoute.js';
 import deviceRoute from './routes/Devices/deviceRoute.js'
 import userRoute from './routes/users/userRoute.js'
-
-
+import assignServiceRoute from './routes/assign services/assignServiceRoute.js'
+import aiServiceRoute from './routes/ai services/aiServiceRoute.js'
 const app = express();
 
 
@@ -23,11 +23,17 @@ app.use(express.json());
 // api for smartlock
 app.use("", smartLockRoute)
 
+// api for users
+app.use("", userRoute)
+
 // api for devices
 app.use("", deviceRoute)
 
-// api for users
-app.use("", userRoute)
+// api for ai services
+app.use("", aiServiceRoute)
+
+// api for assign services
+app.use("", assignServiceRoute)
 
 // api for face-recognisation
 app.use("/api", faceRoute);
@@ -41,7 +47,7 @@ app.use('/api', voiceRoute)
 // routes for admin || xrda3 panel
 app.use("/api/admin", adminRoutes);
 
- 
+
 
 // port
 const PORT = process.env.PORT || 8888;
