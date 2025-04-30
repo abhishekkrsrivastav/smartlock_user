@@ -1,83 +1,74 @@
 import db from '../../config/db.js';
 
+// ➕ Add Assign Service
+export const addAssignService = async (req, res) => {
+  try {
+    const { ai_services_id, assignedUserEmail, assigned_device_code, status_id } = req.body;
 
-export const addAIService = async (req, res) => {
-    try {
-      const { service_name, service_type, assignedUserEmail, assigned_device_code, status_id } = req.body;
-  
-      await db.query(
-        `INSERT INTO ai_services (service_name, service_type, assignedUserEmail, assigned_device_code, status_id)
-         VALUES (?, ?, ?, ?, ?)`,
-        [service_name, service_type, assignedUserEmail, assigned_device_code, status_id]
-      );
-  
-      res.status(201).json({ message: "AI service created successfully" });
-    } catch (error) {
-      console.error('Error creating AI service:', error);
-      res.status(500).json({ error: 'Server error', details: error.message });
-    }
-  };
-  
+    await db.query(
+      `INSERT INTO assign_services (ai_services_id, assignedUserEmail, assigned_device_code, status_id)
+       VALUES (?, ?, ?, ?)`,
+      [ai_services_id, assignedUserEmail, assigned_device_code, status_id]
+    );
 
-  export const getAIServices = async (req, res) => {
-    try {
-      const [rows] = await db.query(`SELECT * FROM ai_services`);
-      res.status(200).json(rows);
-    } catch (error) {
-      console.error('Error fetching AI services:', error);
-      res.status(500).json({ error: 'Server error', details: error.message });
-    }
-  };
-  
+    res.status(201).json({ message: "Assigned service created successfully" });
+  } catch (error) {
+    console.error('Error creating assigned service:', error);
+    res.status(500).json({ error: 'Server error', details: error.message });
+  }
+};
 
-  export const getAIServiceById = async (req, res) => {
-    try {
-      const { id } = req.params;
-      const [rows] = await db.query(`SELECT * FROM ai_services WHERE id = ?`, [id]);
-  
-      if (rows.length === 0) {
-        return res.status(404).json({ message: 'AI service not found' });
-      }
-  
-      res.status(200).json(rows[0]);
-    } catch (error) {
-      console.error('Error fetching AI service:', error);
-      res.status(500).json({ error: 'Server error', details: error.message });
-    }
-  };
-  
+// 📥 Get All Assigned Services (with service name)
+export const getAssignServices = async (req, res) => {
+  try {
+    const [results] = await db.query(
+      `SELECT 
+         a.id, 
+         s.service_name, 
+         a.assignedUserEmail, 
+         a.assigned_device_code, 
+         a.status_id 
+       FROM assign_services a
+       JOIN ai_services s ON a.ai_services_id = s.id`
+    );
 
-  export const editAIService = async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { service_name, service_type, assignedUserEmail, assigned_device_code, status_id } = req.body;
-  
-      await db.query(
-        `UPDATE ai_services 
-         SET service_name = ?, service_type = ?, assignedUserEmail = ?, assigned_device_code = ?, status_id = ?
-         WHERE id = ?`,
-        [service_name, service_type, assignedUserEmail, assigned_device_code, status_id, id]
-      );
-  
-      res.status(200).json({ message: "AI service updated successfully" });
-    } catch (error) {
-      console.error('Error updating AI service:', error);
-      res.status(500).json({ error: 'Server error', details: error.message });
-    }
-  };
-  
+    res.status(200).json({ services: results });
+  } catch (error) {
+    console.error('Error fetching assigned services:', error);
+    res.status(500).json({ error: 'Server error', details: error.message });
+  }
+};
 
-  export const deleteAIService = async (req, res) => {
-    try {
-      const { id } = req.params;
-  
-      await db.query(`DELETE FROM ai_services WHERE id = ?`, [id]);
-  
-      res.status(200).json({ message: "AI service deleted successfully" });
-    } catch (error) {
-      console.error('Error deleting AI service:', error);
-      res.status(500).json({ error: 'Server error', details: error.message });
-    }
-  };
-  
-  
+// ✏️ Update Assign Service
+export const updateAssignService = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { ai_services_id, assignedUserEmail, assigned_device_code, status_id } = req.body;
+
+    await db.query(
+      `UPDATE assign_services 
+       SET ai_services_id = ?, assignedUserEmail = ?, assigned_device_code = ?, status_id = ?
+       WHERE id = ?`,
+      [ai_services_id, assignedUserEmail, assigned_device_code, status_id, id]
+    );
+
+    res.status(200).json({ message: "Assigned service updated successfully" });
+  } catch (error) {
+    console.error('Error updating assigned service:', error);
+    res.status(500).json({ error: 'Server error', details: error.message });
+  }
+};
+
+// ❌ Delete Assign Service
+export const deleteAssignService = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await db.query(`DELETE FROM assign_services WHERE id = ?`, [id]);
+
+    res.status(200).json({ message: "Assigned service deleted successfully" });
+  } catch (error) {
+    console.error('Error deleting assigned service:', error);
+    res.status(500).json({ error: 'Server error', details: error.message });
+  }
+};

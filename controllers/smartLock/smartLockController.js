@@ -50,10 +50,7 @@ export const create = async (req, res) => {
     }
 }
 
-
-
-
-
+ 
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -67,10 +64,7 @@ export const login = async (req, res) => {
         if (existingUser.length === 0) {
             return res.status(404).json({ message: "No email registered" });
         }
-
-        
-
-
+ 
         // password matching
         const verifyPassword = await bcrypt.compare(password, existingUser[0].password);
         if (!verifyPassword) {
@@ -86,16 +80,18 @@ export const login = async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: '9h' }
         );
-
+        const user_data = existingUser[0];
+        delete user_data.password;
         res.status(200).send({
             success: true,
             message: 'Login successful',
             token,
-            existingUser: {
-                id: existingUser[0].id,
-                email: existingUser[0].email,
-                userType: existingUser[0].userType,
-            }
+            // existingUser: {
+            //     id: existingUser[0].id,
+            //     email: existingUser[0].email,
+            //     userType: existingUser[0].userType,
+            // }
+            user_data
         });
 
     } catch (error) {

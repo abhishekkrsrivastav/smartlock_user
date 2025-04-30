@@ -112,5 +112,26 @@ export const saveSentence = async (req, res) => {
     }
 }
 
+// adding keyword
 
+export const addKeyword = async (req, res) => {
+    try {
+        // const {category_name } = req.body;
+        // if(!category_name){
+        //     return res.status(400).json({
+        //         success:false,
+        //         message:"Missing reequired fields"
+        //     });
+        // }
+        // const [categoryResult]=await db.query(`insert into category(category_name) values(?)`,[category_name])
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            success: false,
+            message: "Error in Api",
+            details: error.message
+        })
+
+    }
+}
 
