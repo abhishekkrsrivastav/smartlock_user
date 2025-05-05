@@ -1,12 +1,12 @@
 import express from 'express';
-import { getResponse, askKeyword, saveSentence, insertFullIntent } from '../../controllers/voice command/voiceController.js';
+import { getResponse, askKeyword, saveSentence, addData } from '../../controllers/voice command/voiceController.js';
 
-import {
-    createRecord,
-    getRecord,
-    updateRecord,
-    deleteRecord
-} from "../../controllers/voice command/voiceController.js";
+// import {
+//     createRecord,
+//     getRecord,
+//     updateRecord,
+//     deleteRecord
+// } from "../../controllers/voice command/voiceController.js";
 
 
 
@@ -22,13 +22,15 @@ router.post('/save-sentence', saveSentence)
 
 // scalable api for all tables
 
-router.post("/:table", createRecord);
-router.get("/:table/:id?", getRecord);
-router.put("/:table/:id", updateRecord);
-router.delete("/:table/:id", deleteRecord);
+// router.post("/:table", createRecord);
+// router.get("/:table/:id?", getRecord);
+// router.put("/:table/:id", updateRecord);
+// router.delete("/:table/:id", deleteRecord);
 
-// new
-router.post("/insert", insertFullIntent);
+// // new
+// router.post("/insert", insertFullIntent);
+
+router.post('/data-entry', addData);
 
 export default router;
 

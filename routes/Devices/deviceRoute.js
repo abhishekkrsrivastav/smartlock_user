@@ -1,11 +1,19 @@
-import express from "express";
-import { addDevice, deleteDevice, editDevice, getDevice } from "../../controllers/devices/deviceController.js";
+import express from 'express';
+import { requireSignIn } from '../../middleware/smartLock/requireSignIn.js';
+import {
+  addDevice,
+  getDevices,
+  updateDevice,
+  deleteDevice
+} from '../../controllers/devices/deviceController.js';
 
 const router = express.Router();
 
-router.post("/add-device", addDevice);
-router.get("/get-device", getDevice)
-router.put('/edit-device/:id', editDevice);
-router.delete('/delete-device/:id', deleteDevice);
+// All routes require user to be signed in
+router.post('/add-device', requireSignIn, addDevice);            
+router.get('/get-device', requireSignIn, getDevices);              
+router.put('/update/:id', requireSignIn, updateDevice);         
+router.delete('/delete/:id', requireSignIn, deleteDevice);       
 
 export default router;
+
