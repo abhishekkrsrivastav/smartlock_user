@@ -1,7 +1,7 @@
 import express from 'express';
 import { deleteUser, getUsers, login, updateUser } from '../../controllers/smartLock/smartLockController.js';
 import { addUser } from '../../controllers/smartLock/smartLockController.js';
-import { requireSignIn } from '../../middleware/smartlock/requireSignIn.js';
+import { requireSignIn } from '../../middleware/smartLock/requireSignIn.js';
 const router = express.Router();
 
 /**

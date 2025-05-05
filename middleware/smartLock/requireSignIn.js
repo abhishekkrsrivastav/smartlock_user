@@ -13,5 +13,5 @@ export const requireSignIn = (req, res, next) => {
     });
   }
 };
-
+export default requireSignIn;
 
