@@ -119,14 +119,22 @@ const router = express.Router();
 router.post("/login", login);
 // router.post("/create", requireSignIn, addUser);
 
-/**
+ /**
  * @swagger
- * /api/user/add:
+ * /add:
  *   post:
- *     summary: Add a new user (Admin & Vendor only)
+ *     summary: Add a new user (Admin, Vendor)
  *     tags: [User]
  *     security:
  *       - bearerAuth: []
+ *     description: |
+ *       **Role-based access:**  
+ *       - **Admin:** Can add Admin, Vendor, and Customer.  
+ *       - **Vendor:** Can add only Customers.  
+ *       - **Customer:** Cannot add any users.
+ *       
+ *       > 🔐 Only Admin and Vendor are allowed to access this endpoint.
+ *       
  *     requestBody:
  *       required: true
  *       content:
@@ -140,46 +148,61 @@ router.post("/login", login);
  *               - phoneNumber
  *               - password
  *               - userType
- *             properties:
- *               fname:
- *                 type: string
- *               lname:
- *                 type: string
- *               email:
- *                 type: string
- *               phoneNumber:
- *                 type: string
- *               password:
- *                 type: string
- *               userType:
- *                 type: integer
- *                 description: 1 = Admin, 2 = Vendor, 3 = Customer
+ *           examples:
+ *             AdminCreatesVendor:
+ *               summary: Admin creates vendor
+ *               value:
+ *                 fname: shruti
+ *                 lname: dulare
+ *                 email: shru@gmail.com
+ *                 phoneNumber: "7059290951"
+ *                 password: shru123
+ *                 userType: 2
+ *             VendorCreatesCustomer:
+ *               summary: Vendor creates customer
+ *               value:
+ *                 fname: abhishek
+ *                 lname: srivastav
+ *                 email: abhi@gmail.com
+ *                 phoneNumber: "7059290951"
+ *                 password: abhi123
+ *                 userType: 3
  *     responses:
  *       201:
  *         description: User added successfully
  *       400:
  *         description: Missing required fields
  *       403:
- *         description: Role not allowed to add user
+ *         description: Unauthorized to add this type of user
  *       409:
  *         description: Email already exists
  *       500:
- *         description: Server error
+ *         description: Internal server error
  */
 
+
+
 router.post('/add', requireSignIn, addUser);
+ 
 /**
  * @swagger
- * /api/user/get:
+ * /get:
  *   get:
- *     summary: Get user(s) based on role
+ *     summary: Get users list (role-based access)
  *     tags: [User]
  *     security:
  *       - bearerAuth: []
- *     description: Admin gets all users, Vendor gets own customers, Customer gets self.
+ *     description: |
+ *       **Role-based access:**  
+ *       - **Admin:** Can view all users.  
+ *       - **Vendor:** Can view only the customers they have created.  
+ *       - **Customer:** Can view only their own data.
+ *       
+ *       > 🔍 This endpoint returns user details based on the requesting user's role.
+ *       
  *     responses:
  *       200:
- *         description: List of users
+ *         description: Users fetched successfully
  *         content:
  *           application/json:
  *             schema:
@@ -187,28 +210,47 @@ router.post('/add', requireSignIn, addUser);
  *               properties:
  *                 success:
  *                   type: boolean
+ *                   example: true
  *                 users:
  *                   type: array
  *                   items:
  *                     type: object
  *                     properties:
- *                       id: { type: integer }
- *                       fname: { type: string }
- *                       lname: { type: string }
- *                       email: { type: string }
- *                       phoneNumber: { type: string }
- *                       userType: { type: integer }
- *                       created_by: { type: integer }
+ *                       id:
+ *                         type: integer
+ *                         example: 1
+ *                       fname:
+ *                         type: string
+ *                         example: John
+ *                       lname:
+ *                         type: string
+ *                         example: Doe
+ *                       email:
+ *                         type: string
+ *                         example: john.doe@example.com
+ *                       phoneNumber:
+ *                         type: string
+ *                         example: "1234567890"
+ *                       userType:
+ *                         type: integer
+ *                         example: 2
+ *                       created_by:
+ *                         type: integer
+ *                         example: 1
  *       500:
- *         description: Server error
+ *         description: Internal server error
  */
 
+
+
+
 router.get('/get', requireSignIn, getUsers);
+ 
 /**
  * @swagger
- * /api/user/update/{id}:
+ * /update/{id}:
  *   put:
- *     summary: Update user details (only self unless Admin)
+ *     summary: Update user profile (self-edit only for Vendor/Customer)
  *     tags: [User]
  *     security:
  *       - bearerAuth: []
@@ -218,35 +260,52 @@ router.get('/get', requireSignIn, getUsers);
  *         required: true
  *         schema:
  *           type: integer
- *         description: ID of the user to update
+ *         description: ID of the user to be updated
+ *     description: |
+ *       **Role-based access:**  
+ *       - **Admin:** Can only update their own profile.  
+ *       - **Vendor:** Can only update their own profile.  
+ *       - **Customer:** Can only update their own profile.
+ *       
+ *       > ⚠️ Users cannot update other users' information.
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             properties:
- *               fname: { type: string }
- *               lname: { type: string }
- *               email: { type: string }
- *               phoneNumber: { type: string }
- *               password: { type: string }
- *               userType: { type: integer }
+ *             required:
+ *               - fname
+ *               - lname
+ *               - email
+ *               - phoneNumber
+ *               - password
+ *               - userType
+ *           example:
+ *             fname: Ajay
+ *             lname: Mehta
+ *             email: ajay@gmail.com
+ *             phoneNumber: "9876543210"
+ *             password: newpassword123
+ *             userType: 3
  *     responses:
  *       200:
  *         description: User updated successfully
  *       403:
- *         description: Not authorized to update this user
+ *         description: Unauthorized to edit this profile
  *       500:
- *         description: Server error
+ *         description: Internal server error
  */
 
+
+
 router.put('/update/:id', requireSignIn, updateUser);
+ 
 /**
  * @swagger
- * /api/user/delete/{id}:
+ * /delete/{id}:
  *   delete:
- *     summary: Delete a user (Admins can delete anyone, Vendors their customers, Customers themselves)
+ *     summary: Delete a user (based on role)
  *     tags: [User]
  *     security:
  *       - bearerAuth: []
@@ -257,14 +316,24 @@ router.put('/update/:id', requireSignIn, updateUser);
  *         schema:
  *           type: integer
  *         description: ID of the user to delete
+ *     description: |
+ *       **Role-based access:**  
+ *       - **Admin:** Can delete any user.  
+ *       - **Vendor:** Can delete only customers created by them.  
+ *       - **Customer:** Can delete only their own account.
+ *       
+ *       > ⚠️ Users cannot delete other users unless permitted by their role.
  *     responses:
  *       200:
  *         description: User deleted successfully
  *       403:
  *         description: Not authorized to delete this user
  *       500:
- *         description: Server error
+ *         description: Internal server error
  */
+
+
+
 
 router.delete('/delete/:id', requireSignIn, deleteUser);
 
