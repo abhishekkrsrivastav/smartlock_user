@@ -11,7 +11,7 @@ import morgan from 'morgan';
 import db from './config/db.js';
 
 // routes imports
- 
+
 import faceRoute from './routes/face recognition/faceRoute.js'
 import smartLockRoute from './routes/smartlock/smartLockRoute.js'
 import voiceRoute from './routes/voice command/voiceRoute.js';
@@ -19,7 +19,7 @@ import deviceRoute from './routes/Devices/deviceRoute.js'
 import userRoute from './routes/users/userRoute.js'
 import assignServiceRoute from './routes/assign services/assignServiceRoute.js'
 import aiServiceRoute from './routes/ai services/aiServiceRoute.js'
-
+import subscriptionRoute from './routes/subscription/subscriptionRoute.js'
 
 // swagger api config
 const options = {
@@ -27,7 +27,7 @@ const options = {
         openapi: "3.0.4",
         info: {
             title: "SmartLock Project",
-            description: "Node Expressjs SmartLock Project"
+            description: "API'S Documentation for SmartLock Project"
         },
         servers: [{
             url: "https://smartlock-user.onrender.com"
@@ -67,6 +67,8 @@ app.use("", aiServiceRoute)
 // api for assign services
 app.use("", assignServiceRoute)
 
+// api for subscription
+app.use("", subscriptionRoute)
 // api for face-recognisation
 app.use("/api", faceRoute);
 
@@ -76,7 +78,7 @@ app.use("/api", faceRoute);
 // routes for voice command
 app.use('/api', voiceRoute)
 
- 
+
 
 
 

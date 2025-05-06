@@ -6,11 +6,11 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/user/login:
+ * /login:
  *   post:
- *     summary: User login
+ *     summary: Login (Admin, Vendor, Customer)
  *     tags: [User]
- *     description: Authenticates a user and returns a JWT token.
+ *     description: Authenticates a user and returns a JWT token if credentials are valid.
  *     requestBody:
  *       required: true
  *       content:
@@ -23,10 +23,24 @@ const router = express.Router();
  *             properties:
  *               email:
  *                 type: string
- *                 example: user@example.com
  *               password:
  *                 type: string
- *                 example: user@123
+ *           examples:
+ *             Admin:
+ *               summary: Admin login
+ *               value:
+ *                 email: admin@gmail.com
+ *                 password: admin123
+ *             Vendor:
+ *               summary: Vendor login
+ *               value:
+ *                 email: shru@gmail.com
+ *                 password: shru123
+ *             Customer:
+ *               summary: Customer login
+ *               value:
+ *                 email: shruti@gmail.com
+ *                 password: shru123
  *     responses:
  *       200:
  *         description: Login successful
@@ -43,8 +57,54 @@ const router = express.Router();
  *                   type: string
  *                 user_data:
  *                   type: object
+ *             examples:
+ *               Admin:
+ *                 summary: Admin Login Response
+ *                 value:
+ *                   success: true
+ *                   message: Login successful
+ *                   token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                   user_data:
+ *                     id: 1
+ *                     fname: ajit
+ *                     lname: singh
+ *                     email: admin@gmail.com
+ *                     phoneNumber: "7059290951"
+ *                     userType: 1
+ *                     created_at: "2025-05-05T06:11:30.000Z"
+ *                     created_by: null
+ *               Vendor:
+ *                 summary: Vendor Login Response
+ *                 value:
+ *                   success: true
+ *                   message: Login successful
+ *                   token: eyJh...vendor
+ *                   user_data:
+ *                     id: 2
+ *                     fname: shruti
+ *                     lname: dulare
+ *                     email: shru@gmail.com
+ *                     phoneNumber: "9876543210"
+ *                     userType: 2
+ *                     created_at: "2025-05-05T08:00:00.000Z"
+ *                     created_by: 1
+ *               Customer:
+ *                 summary: Customer Login Response
+ *                 value:
+ *                   success: true
+ *                   message: Login successful
+ *                   token: eyJh...customer
+ *                   user_data:
+ *                     id: 3
+ *                     fname: shruti
+ *                     lname: dulare
+ *                     email: shruti@gmail.com
+ *                     phoneNumber: "9090909090"
+ *                     userType: 3
+ *                     created_at: "2025-05-05T10:00:00.000Z"
+ *                     created_by: 2
  *       400:
- *         description: Missing email or password
+ *         description: Email or password missing
  *       401:
  *         description: Invalid credentials
  *       404:
@@ -54,9 +114,11 @@ const router = express.Router();
  */
 
 
+
+
 router.post("/login", login);
 // router.post("/create", requireSignIn, addUser);
- 
+
 /**
  * @swagger
  * /api/user/add:

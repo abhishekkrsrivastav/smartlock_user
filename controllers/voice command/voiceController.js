@@ -317,36 +317,45 @@ export const saveSentence = async (req, res) => {
   
   
 
- 
-
 export const addData = async (req, res) => {
-  const { category, action, keyword, question, response } = req.body;
-
-  try {
-    // 1. Insert Category
-    const categoryQuery = 'INSERT INTO category (category_name) VALUES (?)';
-    const [categoryResult] = await db.query(categoryQuery, [category.category_name]);
-
-    // 2. Insert Action with category_id
-    const actionQuery = 'INSERT INTO actions (action_name, category_id) VALUES (?, ?)';
-    const [actionResult] = await db.query(actionQuery, [action.action_name, categoryResult.insertId]);
-
-    // 3. Insert Keyword with action_id
-    const keywordQuery = 'INSERT INTO keywords (keyword_name, action_id) VALUES (?, ?)';
-    const [keywordResult] = await db.query(keywordQuery, [keyword.keyword_name, actionResult.insertId]);
-
-    // 4. Insert Question with action_id
-    const questionQuery = 'INSERT INTO questions (question_text, action_id) VALUES (?, ?)';
-    await db.query(questionQuery, [question.question_text, actionResult.insertId]);
-
-    // 5. Insert Response with keyword_id
-    const responseQuery = 'INSERT INTO responses (response_text, keyword_id) VALUES (?, ?)';
-    await db.query(responseQuery, [response.response_text, keywordResult.insertId]);
-
-    // Return success response
-    res.status(201).json({ message: 'Data successfully added!' });
-  } catch (error) {
-    console.error('Error while adding data:', error);
-    res.status(500).json({ error: 'Something went wrong!' });
-  }
-};
+    const { category_name, action_name, keyword_name, question_text, response_text } = req.body;
+  
+    try {
+      // 1. Check or Insert Category
+      let [catResult] = await db.query('SELECT category_id FROM category WHERE category_name = ?', [category_name]);
+      let categoryId;
+      if (catResult.length > 0) {
+        categoryId = catResult[0].category_id;
+      } else {
+        const [insertCat] = await db.query('INSERT INTO category (category_name) VALUES (?)', [category_name]);
+        categoryId = insertCat.insertId;
+      }
+  
+      // 2. Insert Action
+      const [insertAction] = await db.query(
+        'INSERT INTO actions (action_name, category_id) VALUES (?, ?)',
+        [action_name, categoryId]
+      );
+      const actionId = insertAction.insertId;
+  
+      // 3. Insert Keyword
+      const [insertKeyword] = await db.query(
+        'INSERT INTO keywords (keyword_name, action_id) VALUES (?, ?)',
+        [keyword_name, actionId]
+      );
+      const keywordId = insertKeyword.insertId;
+  
+      // 4. Insert Question
+      await db.query('INSERT INTO questions (question_text, action_id) VALUES (?, ?)', [question_text, actionId]);
+  
+      // 5. Insert Response
+      await db.query('INSERT INTO responses (response_text, keyword_id) VALUES (?, ?)', [response_text, keywordId]);
+  
+      res.status(201).json({ message: `Data added under category '${category_name}' successfully!` });
+    } catch (err) {
+      console.error('Error adding data:', err);
+      res.status(500).json({ error: 'Something went wrong!' });
+    }
+  };
+  
+  
