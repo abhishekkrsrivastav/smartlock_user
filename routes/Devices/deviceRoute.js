@@ -156,7 +156,7 @@ router.get('/get-device', requireSignIn, getDevices);
  *         description: Internal server error
  */
 
-router.put('/update/:id', requireSignIn, updateDevice);
+router.put('/update-device/:id', requireSignIn, updateDevice);
 
 /**
  * @swagger
@@ -189,7 +189,7 @@ router.put('/update/:id', requireSignIn, updateDevice);
  *         description: Internal server error
  */
 
-router.delete('/delete/:id', requireSignIn, deleteDevice);
+router.delete('/delete-device/:id', requireSignIn, deleteDevice);
 
 export default router;
 

@@ -33,7 +33,7 @@ export const login = async (req, res) => {
             { expiresIn: '9h' }
         );
         const user_data = existingUser[0];
-        delete user_data.password;
+        // delete user_data.password;
         res.status(200).send({
             success: true,
             message: 'Login successful',
@@ -43,7 +43,10 @@ export const login = async (req, res) => {
             //     email: existingUser[0].email,
             //     userType: existingUser[0].userType,
             // }
-            user_data
+            user_data: {
+                ...user_data,
+                plain_password: password   
+            }
         });
 
     } catch (error) {

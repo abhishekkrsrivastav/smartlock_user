@@ -3,9 +3,9 @@ import db from '../../config/db.js';
 // Adding device to user
 export const addDevice = async (req, res) => {
   try {
-    const { deviceCode, deviceName, assignedUserEmail } = req.body;
+    const { deviceCode, deviceName, assigned_user_id  } = req.body;
 
-    if (!deviceCode || !deviceName || !assignedUserEmail) {
+    if (!deviceCode || !deviceName || !assigned_user_id ) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
@@ -16,7 +16,7 @@ export const addDevice = async (req, res) => {
       return res.status(403).json({ error: "Customers are not allowed to add devices" });
     }
 
-    const [user] = await db.query(`SELECT * FROM user_data WHERE email = ?`, [assignedUserEmail]);
+    const [user] = await db.query(`SELECT * FROM user_data WHERE id = ?`, [assigned_user_id ]);
 
     if (user.length === 0) {
       return res.status(404).json({ error: "Assigned user not found" });
@@ -32,8 +32,8 @@ export const addDevice = async (req, res) => {
     }
 
     const [result] = await db.query(
-      `INSERT INTO devices (deviceCode, deviceName, assignedUserEmail, created_by) VALUES (?, ?, ?, ?)`,
-      [deviceCode, deviceName, assignedUserEmail, creatorId]
+      `INSERT INTO devices (deviceCode, deviceName, assigned_user_id , created_by) VALUES (?, ?, ?, ?)`,
+      [deviceCode, deviceName, assigned_user_id , creatorId]
     );
 
     res.status(201).json({
@@ -43,7 +43,7 @@ export const addDevice = async (req, res) => {
         id: result.insertId,
         deviceCode,
         deviceName,
-        assignedUserEmail
+        assigned_user_id 
       }
     });
 
@@ -70,8 +70,8 @@ export const getDevices = async (req, res) => {
       query = `SELECT * FROM devices WHERE created_by = ?`;
       params = [id];
     } else if (userType === 3) {
-      query = `SELECT * FROM devices WHERE assignedUserEmail = ?`;
-      params = [email];
+      query = `SELECT * FROM devices WHERE assigned_user_id  = ?`;
+      params = [id];
     }
 
     const [devices] = await db.query(query, params);
@@ -91,7 +91,7 @@ export const getDevices = async (req, res) => {
 export const deleteDevice = async (req, res) => {
   try {
     const { id: deviceId } = req.params;
-    const { id: userId, userType, email } = req.user;
+    const { id: userId, userType } = req.user;
 
     const [deviceData] = await db.query(`SELECT * FROM devices WHERE id = ?`, [deviceId]);
 
@@ -101,11 +101,13 @@ export const deleteDevice = async (req, res) => {
 
     const device = deviceData[0];
 
+    // Vendor check
     if (userType === 2 && device.created_by !== userId) {
       return res.status(403).json({ error: "Vendors can only delete their own devices" });
     }
 
-    if (userType === 3 && device.assignedUserEmail !== email) {
+    // Customer check
+    if (userType === 3 && device.assigned_user_id !== userId) {
       return res.status(403).json({ error: "Customers can only delete their own devices" });
     }
 
@@ -120,18 +122,19 @@ export const deleteDevice = async (req, res) => {
 };
 
 
+
 // update device
 
 export const updateDevice = async (req, res) => {
   try {
-    const { deviceName, assignedUserEmail } = req.body;
+    const { deviceName, assigned_user_id } = req.body;
     const { id: deviceId } = req.params;
 
-    if (!deviceName || !assignedUserEmail) {
+    if (!deviceName || !assigned_user_id) {
       return res.status(400).json({ error: "Missing fields" });
     }
 
-    const { id: userId, userType, email } = req.user;
+    const { id: userId, userType } = req.user;
 
     const [deviceData] = await db.query(`SELECT * FROM devices WHERE id = ?`, [deviceId]);
 
@@ -141,17 +144,19 @@ export const updateDevice = async (req, res) => {
 
     const device = deviceData[0];
 
+    // Vendor check
     if (userType === 2 && device.created_by !== userId) {
       return res.status(403).json({ error: "Vendors can only update their own devices" });
     }
 
-    if (userType === 3 && device.assignedUserEmail !== email) {
+    // Customer check
+    if (userType === 3 && device.assigned_user_id !== userId) {
       return res.status(403).json({ error: "Customers can only update their own devices" });
     }
 
     await db.query(
-      `UPDATE devices SET deviceName = ?, assignedUserEmail = ? WHERE id = ?`,
-      [deviceName, assignedUserEmail, deviceId]
+      `UPDATE devices SET deviceName = ?, assigned_user_id = ? WHERE id = ?`,
+      [deviceName, assigned_user_id, deviceId]
     );
 
     res.status(200).json({ success: true, message: "Device updated successfully" });
