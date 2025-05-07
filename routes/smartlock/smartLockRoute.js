@@ -282,11 +282,11 @@ router.get('/get', requireSignIn, getUsers);
  *               - password
  *               - userType
  *           example:
- *             fname: Ajay
- *             lname: Mehta
- *             email: ajay@gmail.com
+ *             fname: test
+ *             lname: singh
+ *             email: test@gmail.com
  *             phoneNumber: "9876543210"
- *             password: newpassword123
+ *             password: test123
  *             userType: 3
  *     responses:
  *       200:
