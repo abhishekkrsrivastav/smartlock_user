@@ -2,55 +2,7 @@ import db from '../../config/db.js';
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken";
 
-// export const create = async (req, res) => {
-//     try {
-//         const { fname, lname, email, phoneNumber, password, userType } = req.body;
-//         if (!fname || !lname || !email || !phoneNumber || !password || !userType) {
-//             return res.status(400).json({
-//                 success: false,
-//                 message: "Please provide all fields"
-//             });
-//         }
-
-//         const [existingUser] = await db.query(`select * from user_data where email=?`, [email]);
-//         if (existingUser.length > 0) {
-//             return res.status(409).json({
-//                 success: false,
-//                 message: "Email already registered try another one"
-//             });
-//         }
-
-//         const salt = await bcrypt.genSalt(10);
-//         const hashedPassword = await bcrypt.hash(password, salt)
-
-//         const [data] = await db.query(`insert into user_data (fname, lname, email, phoneNumber, password, userType) values (?,?,?,?,?,?)`,
-//             [fname, lname, email, phoneNumber, hashedPassword, userType]);
-
-//         if (!data) {
-//             return res.status(404).json({
-//                 success: false,
-//                 message: "No data found"
-//             })
-//         }
-
-//         res.status(201).json({
-//             success: true,
-//             message: "new user added successfully",
-
-//         })
-
-//     } catch (error) {
-//         console.log(error);
-//         res.status(500).json({
-//             success: false,
-//             error
-//         })
-
-
-//     }
-// }
-
-
+//  login for admin, vendor and customer
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -99,68 +51,13 @@ export const login = async (req, res) => {
         res.status(500).send({
             success: false,
             message: 'Error in login user API',
-            error
+            details: error.message
         });
 
     }
 }
 
-
-
-
-
-
-// export const addUser = async (req, res) => {
-//     try {
-//       const { fname, lname, email, phoneNumber, password, userType } = req.body;
-
-//       if (!fname || !lname || !email || !phoneNumber || !password || !userType) {
-//         return res.status(400).json({ message: "All fields are required" });
-//       }
-
-//       // Role-based access check
-//       if (req.user.userType === 2 && userType === 3) { // Vendor can only add customer
-//         return res.status(403).json({ message: "Vendors can only add customers" });
-//       }
-
-//       if (req.user.userType === 3) { // Customers cannot add users
-//         return res.status(403).json({ message: "Customers are not allowed to add users" });
-//       }
-
-//       // Admin can add any user
-//       if (req.user.userType === 1) { // Admin can add anyone
-//         // No restriction for admins here
-//       }
-
-//       const [existing] = await db.query(`SELECT * FROM user_data WHERE email = ?`, [email]);
-//       if (existing.length > 0) {
-//         return res.status(409).json({ message: "Email already exists" });
-//       }
-
-//       const hashedPassword = await bcrypt.hash(password, 10);
-//       const created_by = req.user.id;
-
-//       await db.query(`
-//         INSERT INTO user_data (fname, lname, email, phoneNumber, password, userType, created_by)
-//         VALUES (?, ?, ?, ?, ?, ?, ?)
-//       `, [fname, lname, email, phoneNumber, hashedPassword, userType, created_by]);
-
-//       return res.status(201).json({
-//         success: true,
-//         message: "User added successfully"
-//       });
-
-//     } catch (error) {
-//       console.error("Error in addUser:", error);
-//       return res.status(500).json({
-//         success: false,
-//         message: "Server error",
-//         error
-//       });
-//     }
-//   };
-
-
+// delete for admin , vendor and customer
 export const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
@@ -182,7 +79,7 @@ export const deleteUser = async (req, res) => {
 
     } catch (err) {
         console.error("DeleteUser Error:", err);
-        res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({ message: "Internal server error", details: err.message });
     }
 };
 
@@ -197,15 +94,17 @@ export const updateUser = async (req, res) => {
             return res.status(403).json({ message: "You can only edit your own profile" });
         }
 
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         await db.query(`
         UPDATE user_data SET fname = ?, lname = ?, email=?,phoneNumber = ?, password=?,userType=? WHERE id = ?
-      `, [fname, lname, email, phoneNumber, password, userType, id]);
+      `, [fname, lname, email, phoneNumber, hashedPassword, userType, id]);
 
         res.status(200).json({ success: true, message: "User updated successfully" });
 
     } catch (err) {
         console.error("UpdateUser Error:", err);
-        res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({ message: "Internal server error", details: err.message });
     }
 };
 
@@ -230,7 +129,7 @@ export const getUsers = async (req, res) => {
 
     } catch (err) {
         console.error("GetUsers Error:", err);
-        res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({ message: "Internal server error", details: err.message });
     }
 };
 
@@ -269,7 +168,7 @@ export const addUser = async (req, res) => {
 
     } catch (err) {
         console.error("AddUser Error:", err);
-        res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({ message: "Internal server error", details: err.message });
     }
 };
 
@@ -284,4 +183,3 @@ export const addUser = async (req, res) => {
 
 
 
- 
