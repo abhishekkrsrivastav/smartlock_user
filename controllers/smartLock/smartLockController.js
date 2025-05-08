@@ -128,7 +128,8 @@ export const getUsers = async (req, res) => {
         }
 
         const [users] = await db.query(query, values);
-        res.status(200).json({ success: true, users });
+        // res.status(200).json({ success: true, users });
+        res.json({ message:"sanket" ,users});
 
     } catch (err) {
         // console.error("GetUsers Error:");
