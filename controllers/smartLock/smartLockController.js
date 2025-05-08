@@ -131,8 +131,8 @@ export const getUsers = async (req, res) => {
         res.status(200).json({ success: true, users });
 
     } catch (err) {
-        console.error("GetUsers Error:", err);
-        res.status(500).json({ message: "Internal server error", details: err.message });
+        console.error("GetUsers Error:");
+        // res.status(500).json({ message: "Internal server error", details: err.message });
     }
 };
 
