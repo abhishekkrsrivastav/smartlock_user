@@ -244,7 +244,7 @@ router.post('/add', requireSignIn, addUser);
 
 
 
-router.get('/get', requireSignIn, getUsers);
+router.get('/get',   getUsers);
  
 /**
  * @swagger
