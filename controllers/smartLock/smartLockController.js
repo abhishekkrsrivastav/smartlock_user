@@ -112,31 +112,31 @@ export const updateUser = async (req, res) => {
 };
 
 
-export const getUsers = async (req, res) => {
-    try {
-        let query = `SELECT id, fname, lname, email, phoneNumber, userType, created_by FROM user_data`;
-        let values = [];
+// export const getUsers = async (req, res) => {
+//     try {
+//         let query = `SELECT id, fname, lname, email, phoneNumber, userType, created_by FROM user_data`;
+//         let values = [];
 
-        if (req.user.userType === 2) {
-            query += ` WHERE created_by = ?`;
-            values.push(req.user.id);
-        }
+//         if (req.user.userType === 2) {
+//             query += ` WHERE created_by = ?`;
+//             values.push(req.user.id);
+//         }
 
-        if (req.user.userType === 3) {
-            query += ` WHERE id = ?`;
-            values.push(req.user.id);
-        }
+//         if (req.user.userType === 3) {
+//             query += ` WHERE id = ?`;
+//             values.push(req.user.id);
+//         }
 
-        const [users] = await db.query(query, values);
-        // res.status(200).json({ success: true, users });
-        res.json({ message:"sanket" ,users});
+//         const [users] = await db.query(query, values);
+//         // res.status(200).json({ success: true, users });
+//         res.json({ message:"sanket" ,users});
 
-    } catch (err) {
-        // console.error("GetUsers Error:");
-        // res.status(500).json({ message: "Internal server error", details: err.message });
-        res.json({ message: "xrda3" });
-    }
-};
+//     } catch (err) {
+//         // console.error("GetUsers Error:");
+//         // res.status(500).json({ message: "Internal server error", details: err.message });
+//         res.json({ message: "xrda3" });
+//     }
+// };
 
 
 
@@ -180,7 +180,31 @@ export const addUser = async (req, res) => {
 
 
 
+export const getUsers = async (req, res) => {
+    try {
+        // let query = `SELECT id, fname, lname, email, phoneNumber, userType, created_by FROM user_data`;
+        // let values = [];
 
+        // if (req.user.userType === 2) {
+        //     query += ` WHERE created_by = ?`;
+        //     values.push(req.user.id);
+        // }
+
+        // if (req.user.userType === 3) {
+        //     query += ` WHERE id = ?`;
+        //     values.push(req.user.id);
+        // }
+
+        const [users] = await db.query(`select * from user_data`);
+        // res.status(200).json({ success: true, users });
+        res.json({ message:"sanket" ,users});
+
+    } catch (err) {
+        // console.error("GetUsers Error:");
+        // res.status(500).json({ message: "Internal server error", details: err.message });
+        res.json({ message: "xrda3" });
+    }
+};
 
 
 
