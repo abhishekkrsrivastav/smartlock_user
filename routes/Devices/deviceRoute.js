@@ -18,7 +18,7 @@ const router = express.Router();
  *     summary: Add a new device (Admin, Vendor only)
  *     tags: [Device]
  *     security:
- *       - bearerAuth: []
+ *       - Bearer Token: []
  *     requestBody:
  *       required: true
  *       content:
@@ -28,7 +28,7 @@ const router = express.Router();
  *             required:
  *               - deviceCode
  *               - deviceName
- *               - assignedUserEmail
+ *               - assigned_user_id
  *             properties:
  *               deviceCode:
  *                 type: string
@@ -36,9 +36,9 @@ const router = express.Router();
  *               deviceName:
  *                 type: string
  *                 example: Smart Lock Pro
- *               assignedUserEmail:
- *                 type: string
- *                 example: customer@example.com
+ *               assigned_user_id:
+ *                 type: int
+ *                 example: 1
  *     description: >
  *       **Role-based access:**  
  *       - **Admin:** Can assign device to any user.  
@@ -99,9 +99,9 @@ router.post('/add-device', requireSignIn, addDevice);
  *                       deviceName:
  *                         type: string
  *                         example: Smart Lock Pro
- *                       assignedUserEmail:
- *                         type: string
- *                         example: customer@example.com
+ *                       assigned_user_id:
+ *                         type: integer
+ *                         example: 1
  *                       created_by:
  *                         type: integer
  *                         example: 2
@@ -113,7 +113,7 @@ router.get('/get-device', requireSignIn, getDevices);
 
 /**
  * @swagger
- * /update/{id}:
+ * /update-device/{id}:
  *   put:
  *     summary: Update a device (based on role)
  *     tags: [Device]
@@ -139,10 +139,10 @@ router.get('/get-device', requireSignIn, getDevices);
  *             type: object
  *             required:
  *               - deviceName
- *               - assignedUserEmail
+ *               - assigned_user_id
  *             example:
  *               deviceName: Updated Lock
- *               assignedUserEmail: customer@example.com
+ *               assigned_user_id: 1
  *     responses:
  *       200:
  *         description: Device updated successfully
@@ -160,7 +160,7 @@ router.put('/update-device/:id', requireSignIn, updateDevice);
 
 /**
  * @swagger
- * /delete/{id}:
+ * /delete-device/{id}:
  *   delete:
  *     summary: Delete a device (based on role)
  *     tags: [Device]

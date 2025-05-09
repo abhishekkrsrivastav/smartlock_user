@@ -19,22 +19,42 @@ import deviceRoute from './routes/Devices/deviceRoute.js'
 import userRoute from './routes/users/userRoute.js'
 import assignServiceRoute from './routes/assign services/assignServiceRoute.js'
 import aiServiceRoute from './routes/ai services/aiServiceRoute.js'
+import subPlanRoute from './routes/subscription plan/subPlanRoute.js'
 import subscriptionRoute from './routes/subscription/subscriptionRoute.js'
 
 // swagger api config
+ 
 const options = {
-    definition: {
-        openapi: "3.0.4",
-        info: {
-            title: "SmartLock Project",
-            description: "API'S Documentation for SmartLock Project"
-        },
-        servers: [{
-            url: "https://smartlock-user.onrender.com"
-        }]
+  definition: {
+    openapi: "3.0.4",
+    info: {
+      title: "SmartLock Project",
+      description: "API's Documentation for SmartLock Project"
     },
-    apis: ['./routes/**/*.js'],
-}
+    components: {
+      securitySchemes: {
+        bearerToken: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT"
+        }
+      }
+    },
+    security: [
+      {
+        bearerToken: []   
+      }
+    ],
+    servers: [
+      {
+        url: "https://smartlock-user.onrender.com"
+      }
+    ]
+  },
+  apis: ["./routes/**/*.js"]
+};
+
+
 
 const spec = swaggerJSDoc(options);
 
@@ -66,6 +86,9 @@ app.use("", aiServiceRoute)
 
 // api for assign services
 app.use("", assignServiceRoute)
+
+// api for subscription Plan
+app.use("", subPlanRoute)
 
 // api for subscription
 app.use("", subscriptionRoute)
