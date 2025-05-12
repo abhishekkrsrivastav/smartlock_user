@@ -168,3 +168,119 @@ export const updateDevice = async (req, res) => {
 };
 
   
+ 
+ 
+export const logEntry = async (req, res) => {
+  try {
+    const { user_id, device_id, access_type, age_id, gender_id } = req.body;
+    const userType = req.user.userType;   
+
+    // Check for valid access_type
+    if (!["in", "out"].includes(access_type)) {
+      return res.status(400).json({ message: "Invalid access_type, use 'in' or 'out'" });
+    }
+
+    if (access_type === "in") {
+      // Insert new IN record
+      await db.query(
+        `INSERT INTO entrylog (user_id, device_id, in_time, age_id, gender_id)
+         VALUES (?, ?, NOW(), ?, ?)`,
+        [user_id, device_id, age_id || null, gender_id || null]
+      );
+      return res.status(201).json({ message: "In-time logged" });
+    }
+
+    if (access_type === "out") {
+      // Find latest IN record without OUT
+      const [rows] = await db.query(
+        `SELECT * FROM entrylog 
+         WHERE user_id = ? AND device_id = ? AND out_time IS NULL 
+         ORDER BY in_time DESC LIMIT 1`,
+        [user_id, device_id]
+      );
+
+      if (rows.length === 0) {
+        return res.status(404).json({ message: "No in-time found for out-time update" });
+      }
+
+      // Update out_time in that record
+      await db.query(
+        `UPDATE entrylog SET out_time = NOW() WHERE id = ?`,
+        [rows[0].id]
+      );
+
+      return res.status(200).json({ message: "Out-time updated" });
+    }
+
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+
+// export const getEntry = async (req, res) => {
+//   try {
+//     const { user_id, device_id } = req.query; // Get user_id and device_id from query params
+
+//     const userType = req.user.userType;  // Accessing userType from req.user
+
+//     // If userType is Customer, only allow them to view their own data
+//     if (userType === 3 && parseInt(user_id) !== req.user.id) {
+//       return res.status(403).json({ message: "Customers can only access their own logs" });
+//     }
+
+//     // Query to fetch entry log details
+//     const [logs] = await db.query(
+//       `SELECT * FROM entrylog WHERE user_id = ? AND device_id = ?`,
+//       [user_id, device_id]
+//     );
+
+//     if (logs.length === 0) {
+//       return res.status(404).json({ message: "No logs found for the provided user and device" });
+//     }
+
+//     res.status(200).json({ success: true, logs });
+
+//   } catch (err) {
+//     res.status(500).json({ message: "Server error", error: err.message });
+//   }
+// };
+
+
+export const getEntry = async (req, res) => {
+  try {
+    const userType = req.user.userType;
+    const userId = req.user.id;
+
+    let query = '';
+    let params = [];
+
+    if (userType === 1) {
+      // Admin can see all logs
+      query = `SELECT * FROM entrylog`;
+    } else if (userType === 2) {
+      // Vendor can see logs of their created customers
+      query = `
+        SELECT e.* FROM entrylog e
+        JOIN user_data u ON e.user_id = u.id
+        WHERE u.created_by = ?
+      `;
+      params = [userId];
+    } else {
+      // Customer can only see their own logs
+      query = `SELECT * FROM entrylog WHERE user_id = ?`;
+      params = [userId];
+    }
+
+    const [logs] = await db.query(query, params);
+
+    if (logs.length === 0) {
+      return res.status(404).json({ message: "No entry logs found" });
+    }
+
+    res.status(200).json({ success: true, logs });
+
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};

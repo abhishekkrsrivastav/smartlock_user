@@ -134,3 +134,27 @@ export const getImage = async (req, res) => {
   }
 }
 
+
+
+// entry 
+
+// export const saveEntryLog = async (req, res) => {
+//   try {
+//     const { user_id, device_id, in_time, out_time, age_id, gender_id } = req.body;
+
+//     // if (!user_id || !device_id || !in_time || !age_id || !gender_id) {
+//     //   return res.status(400).json({ error: "Missing required fields" });
+//     // }
+
+//     await db.query(
+//       `INSERT INTO entrylog (user_id, device_id, in_time, out_time, age_id, gender_id)
+//        VALUES (?, ?, ?, ?, ?, ?)`,
+//       [user_id, device_id, in_time, out_time , age_id, gender_id]
+//     );
+
+//     res.status(200).json({ message: "Entry log saved successfully" });
+//   } catch (error) {
+//     console.error("Error in saveEntryLog:", error);
+//     res.status(500).json({ error: "Server error", details: error.message });
+//   }
+// };

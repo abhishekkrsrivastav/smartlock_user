@@ -52,5 +52,18 @@ const router = express.Router();
 // Create a new subscription plan (Admin)
 router.post('/add-subscription', requireSignIn, createSubscriptionPlan);
 
+
+// Get all subscription plans
+// router.get('/', requireSignIn, getAllSubscriptionPlans);
+
+// // Get a specific subscription plan by ID
+// router.get('/:id', requireSignIn, getSubscriptionPlanById);
+
+// // Update a subscription plan
+// router.put('/:id', requireSignIn, updateSubscriptionPlan);
+
+// // Delete a subscription plan
+// router.delete('/:id', requireSignIn, deleteSubscriptionPlan);
+
 export default router;
 

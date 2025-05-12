@@ -24,3 +24,72 @@ export const createSubscriptionPlan = async (req, res) => {
         res.status(500).json({ error: "Server error", details: error.message });
     }
 }
+
+// export const getAllSubscriptionPlans = async (req, res) => {
+//     try {
+//         const [plans] = await db.query(`SELECT * FROM subscription_plans`);
+//         res.status(200).json({ success: true, plans });
+//     } catch (error) {
+//         res.status(500).json({ message: "Server error", error: error.message });
+//     }
+// };
+
+
+// export const getSubscriptionPlanById = async (req, res) => {
+//     const planId = req.params.id;
+
+//     try {
+//         const [plan] = await db.query(`SELECT * FROM subscription_plans WHERE id = ?`, [planId]);
+
+//         if (plan.length === 0) {
+//             return res.status(404).json({ message: "Subscription Plan not found" });
+//         }
+
+//         res.status(200).json({ success: true, plan: plan[0] });
+//     } catch (error) {
+//         res.status(500).json({ message: "Server error", error: error.message });
+//     }
+// };
+
+
+// export const updateSubscriptionPlan = async (req, res) => {
+//     const planId = req.params.id;
+//     const { plan_name, token_limit, price } = req.body;
+
+//     try {
+//         const [plan] = await db.query(`SELECT * FROM subscription_plans WHERE id = ?`, [planId]);
+
+//         if (plan.length === 0) {
+//             return res.status(404).json({ message: "Subscription Plan not found" });
+//         }
+
+//         await db.query(
+//             `UPDATE subscription_plans SET plan_name = ?, token_limit = ?, price = ? WHERE id = ?`,
+//             [plan_name, token_limit, price, planId]
+//         );
+
+//         res.status(200).json({ success: true, message: "Subscription Plan updated successfully" });
+//     }catch (error) {
+//         res.status(500).json({ message: "Server error", error: error.message });
+//     }
+// }
+
+
+
+// export const deleteSubscriptionPlan = async (req, res) => {
+//     const planId = req.params.id;
+
+//     try {
+//         const [plan] = await db.query(`SELECT * FROM subscription_plans WHERE id = ?`, [planId]);
+
+//         if (plan.length === 0) {
+//             return res.status(404).json({ message: "Subscription Plan not found" });
+//         }
+
+//         await db.query(`DELETE FROM subscription_plans WHERE id = ?`, [planId]);
+
+//         res.status(200).json({ success: true, message: "Subscription Plan deleted successfully" });
+//     } catch (error) {
+//         res.status(500).json({ message: "Server error", error: error.message });
+//     }
+// };

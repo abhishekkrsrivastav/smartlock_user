@@ -4,7 +4,9 @@ import {
   addDevice,
   getDevices,
   updateDevice,
-  deleteDevice
+  deleteDevice,
+  logEntry,
+  getEntry
 } from '../../controllers/devices/deviceController.js';
 
 const router = express.Router();
@@ -190,6 +192,144 @@ router.put('/update-device/:id', requireSignIn, updateDevice);
  */
 
 router.delete('/delete-device/:id', requireSignIn, deleteDevice);
+
+
+/**
+ * @swagger
+ * /entry:
+ *   post:
+ *     summary: Log in-time or out-time for a user entry
+ *     tags: [Entry Log]
+ *     security:
+ *       - bearerAuth: []
+ *     description: >
+ *       Logs the in-time or out-time of a user based on `access_type`.  
+ *       - If `access_type` = `"in"` → inserts a new entry.  
+ *       - If `access_type` = `"out"` → updates the latest unmatched "in" entry.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - user_id
+ *               - device_id
+ *               - access_type
+ *             properties:
+ *               user_id:
+ *                 type: integer
+ *                 example: 7
+ *               device_id:
+ *                 type: integer
+ *                 example: 3
+ *               access_type:
+ *                 type: string
+ *                 enum: [in, out]
+ *                 example: "in"
+ *               age_id:
+ *                 type: integer
+ *                 nullable: true
+ *                 example: 2
+ *               gender_id:
+ *                 type: integer
+ *                 nullable: true
+ *                 example: 1
+ *     responses:
+ *       201:
+ *         description: In-time successfully logged
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "In-time logged"
+ *       200:
+ *         description: Out-time successfully updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Out-time updated"
+ *       400:
+ *         description: Invalid access_type
+ *       404:
+ *         description: No matching in-time found for out
+ *       500:
+ *         description: Server error
+ */
+
+
+
+router.post("/entry", requireSignIn, logEntry);
+
+/**
+ * @swagger
+ * /get-entry:
+ *   get:
+ *     summary: Get entry logs based on user role
+ *     tags: [Entry Log]
+ *     security:
+ *       - bearerAuth: []
+ *     description: >
+ *       - **Admin**: can view all logs.  
+ *       - **Vendor**: can view logs of customers they created.  
+ *       - **Customer**: can view only their own logs.
+ *     responses:
+ *       200:
+ *         description: List of entry logs
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 logs:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 5
+ *                       user_id:
+ *                         type: integer
+ *                         example: 7
+ *                       device_id:
+ *                         type: integer
+ *                         example: 3
+ *                       in_time:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2025-05-12T08:30:00.000Z"
+ *                       out_time:
+ *                         type: string
+ *                         format: date-time
+ *                         nullable: true
+ *                         example: "2025-05-12T09:00:00.000Z"
+ *                       age_id:
+ *                         type: integer
+ *                         nullable: true
+ *                         example: 2
+ *                       gender_id:
+ *                         type: integer
+ *                         nullable: true
+ *                         example: 1
+ *       404:
+ *         description: No entry logs found
+ *       500:
+ *         description: Server error
+ */
+
+router.get('/get-entry', requireSignIn, getEntry);
+
 
 export default router;
 
