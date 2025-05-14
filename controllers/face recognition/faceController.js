@@ -217,3 +217,29 @@ export const getUserImages = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+
+
+ 
+
+export const getAllUserImages = async (req, res) => {
+  try {
+    const [rows] = await db.query(
+      `SELECT user_id, image_path FROM user_image`
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "No images found" });
+    }
+
+    // Convert image_path JSON to array per user
+    const formatted = rows.map(row => ({
+      user_id: row.user_id,
+      images: JSON.parse(row.image_path)
+    }));
+
+    res.status(200).json({ success: true, data: formatted });
+
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};

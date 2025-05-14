@@ -1,5 +1,5 @@
 import express from "express";
-import { addUserImage, getImage, getUserByImagePath,   getUserImages,   saveImagePath } from "../../controllers/face recognition/faceController.js";
+import { addUserImage, getAllUserImages, getImage, getUserByImagePath,   getUserImages,   saveImagePath } from "../../controllers/face recognition/faceController.js";
  
 
 const router = express.Router();
@@ -12,6 +12,6 @@ router.get("/get-image", getImage)
 // final
 router.post("/add-image", addUserImage);         // Add new image (append to existing)
 router.get("/get-image/:user_id", getUserImages); // Get all images of a user
-
+router.get("/getallimages", getAllUserImages); 
 export default router;
 
