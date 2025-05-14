@@ -6,7 +6,9 @@ import {
   updateDevice,
   deleteDevice,
   logEntry,
-  getEntry
+  getEntry,
+  activateDevice,
+  registerDevice
 } from '../../controllers/devices/deviceController.js';
 
 const router = express.Router();
@@ -329,6 +331,19 @@ router.post("/entry", requireSignIn, logEntry);
  */
 
 router.get('/get-entry', requireSignIn, getEntry);
+
+
+
+router.post('/register-device', requireSignIn, registerDevice);
+router.put('/activate-device', requireSignIn, activateDevice);
+
+
+
+
+
+
+
+
 
 
 export default router;

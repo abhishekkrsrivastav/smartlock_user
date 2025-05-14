@@ -3,9 +3,9 @@ import db from '../../config/db.js';
 // Adding device to user
 export const addDevice = async (req, res) => {
   try {
-    const { deviceCode, deviceName, assigned_user_id  } = req.body;
+    const { deviceCode, deviceName, assigned_user_id } = req.body;
 
-    if (!deviceCode || !deviceName || !assigned_user_id ) {
+    if (!deviceCode || !deviceName || !assigned_user_id) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
@@ -16,7 +16,7 @@ export const addDevice = async (req, res) => {
       return res.status(403).json({ error: "Customers are not allowed to add devices" });
     }
 
-    const [user] = await db.query(`SELECT * FROM user_data WHERE id = ?`, [assigned_user_id ]);
+    const [user] = await db.query(`SELECT * FROM user_data WHERE id = ?`, [assigned_user_id]);
 
     if (user.length === 0) {
       return res.status(404).json({ error: "Assigned user not found" });
@@ -33,7 +33,7 @@ export const addDevice = async (req, res) => {
 
     const [result] = await db.query(
       `INSERT INTO devices (deviceCode, deviceName, assigned_user_id , created_by) VALUES (?, ?, ?, ?)`,
-      [deviceCode, deviceName, assigned_user_id , creatorId]
+      [deviceCode, deviceName, assigned_user_id, creatorId]
     );
 
     res.status(201).json({
@@ -43,7 +43,7 @@ export const addDevice = async (req, res) => {
         id: result.insertId,
         deviceCode,
         deviceName,
-        assigned_user_id 
+        assigned_user_id
       }
     });
 
@@ -53,7 +53,7 @@ export const addDevice = async (req, res) => {
   }
 };
 
-  
+
 
 
 // get data of device
@@ -84,7 +84,7 @@ export const getDevices = async (req, res) => {
   }
 };
 
-  
+
 
 
 // delete device
@@ -167,13 +167,13 @@ export const updateDevice = async (req, res) => {
   }
 };
 
-  
- 
- 
+
+
+
 export const logEntry = async (req, res) => {
   try {
     const { user_id, device_id, access_type, age_id, gender_id } = req.body;
-    const userType = req.user.userType;   
+    const userType = req.user.userType;
 
     // Check for valid access_type
     if (!["in", "out"].includes(access_type)) {
@@ -218,34 +218,6 @@ export const logEntry = async (req, res) => {
 };
 
 
-// export const getEntry = async (req, res) => {
-//   try {
-//     const { user_id, device_id } = req.query; // Get user_id and device_id from query params
-
-//     const userType = req.user.userType;  // Accessing userType from req.user
-
-//     // If userType is Customer, only allow them to view their own data
-//     if (userType === 3 && parseInt(user_id) !== req.user.id) {
-//       return res.status(403).json({ message: "Customers can only access their own logs" });
-//     }
-
-//     // Query to fetch entry log details
-//     const [logs] = await db.query(
-//       `SELECT * FROM entrylog WHERE user_id = ? AND device_id = ?`,
-//       [user_id, device_id]
-//     );
-
-//     if (logs.length === 0) {
-//       return res.status(404).json({ message: "No logs found for the provided user and device" });
-//     }
-
-//     res.status(200).json({ success: true, logs });
-
-//   } catch (err) {
-//     res.status(500).json({ message: "Server error", error: err.message });
-//   }
-// };
-
 
 export const getEntry = async (req, res) => {
   try {
@@ -282,5 +254,61 @@ export const getEntry = async (req, res) => {
 
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+
+export const registerDevice = async (req, res) => {
+  try {
+    const { deviceName } = req.body;
+    const created_by = req.user.id;  //taking id for admin 
+
+    const deviceCode = "XRDA3-" + Math.random().toString(36).substring(2, 10).toUpperCase(); // making deviceCode unique by admin
+
+    const [result] = await db.query(`insert into devices (deviceCode, deviceName, status_id, created_by) values (?, ?, ?, ?)`
+      , [deviceCode, deviceName, 4, created_by]);
+
+    res.status(201).json({
+      success: true,
+      message: "Device registered successfully",
+      deviceCode,
+      deviceId: result.insertId
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+
+  }
+}
+
+
+// 
+export const activateDevice = async (req, res) => {
+  try {
+    const { deviceCode, phone_number } = req.body;
+
+    const userType = req.user.userType;
+
+    if (userType !== 2) {
+      return res.status(403).json({ message: "Only vendors can activate devices." })
+    }
+
+    const [device] = await db.query(`select * from devices where deviceCode= ?`, [deviceCode])
+
+    if (device.length === 0) {
+      return res.status(404).json({ message: "Device not found" });
+    }
+
+    if (device[0].status_id === 3) {
+      return res.status(400).json({ message: "Device already activated" });
+    }
+
+    await db.query(
+      `UPDATE devices SET phone_number = ?, status_id = 3 WHERE deviceCode = ?`,
+      [phone_number, deviceCode]
+    );
+    res.status(200).json({ message: "Device activated successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+
   }
 };
