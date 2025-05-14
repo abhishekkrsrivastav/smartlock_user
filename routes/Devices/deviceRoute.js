@@ -8,7 +8,9 @@ import {
   logEntry,
   getEntry,
   activateDevice,
-  registerDevice
+  registerDevice,
+  getDeviceByPhone,
+  getMyDevice
 } from '../../controllers/devices/deviceController.js';
 
 const router = express.Router();
@@ -337,6 +339,9 @@ router.get('/get-entry', requireSignIn, getEntry);
 router.post('/register-device', requireSignIn, registerDevice);
 router.put('/activate-device', requireSignIn, activateDevice);
 
+
+router.get('/my-device', requireSignIn, getMyDevice);
+router.get("/device/by-phone/:phone",  getDeviceByPhone);
 
 
 

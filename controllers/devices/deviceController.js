@@ -312,3 +312,54 @@ export const activateDevice = async (req, res) => {
 
   }
 };
+
+
+export const getMyDevice = async (req, res) => {
+  try {
+    const { phone_number, userType } = req.user; // from JWT decoded token
+    console.log(req.user);
+    
+
+    if (userType !== 3) {
+      return res.status(403).json({ message: "Only customers can access this route" });
+    }
+
+    const [device] = await db.query(
+      `SELECT deviceCode, deviceName, status_id FROM devices WHERE phone_number = ?`,
+      [phone_number]
+    );
+
+    if (device.length === 0) {
+      return res.status(404).json({ message: "No device found for your number" });
+    }
+
+    res.status(200).json({ device });
+
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+
+
+
+ export const getDeviceByPhone = async (req, res) => {
+  try {
+    const { phone } = req.params;
+
+    const [device] = await db.query(
+      `SELECT deviceCode, deviceName, status_id FROM devices WHERE phone_number = ?`,
+      [phone]
+    );
+
+    if (device.length === 0) {
+      return res.status(404).json({ message: "No device found for this phone number" });
+    }
+
+    res.status(200).json({ device });
+
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
