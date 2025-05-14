@@ -228,20 +228,35 @@ export const getEntry = async (req, res) => {
     let params = [];
 
     if (userType === 1) {
-      // Admin can see all logs
-      query = `SELECT * FROM entrylog`;
-    } else if (userType === 2) {
-      // Vendor can see logs of their created customers
+      // Admin: All logs
       query = `
-        SELECT e.* FROM entrylog e
-        JOIN user_data u ON e.user_id = u.id
-        WHERE u.created_by = ?
+        SELECT e.user_id, e.device_id, e.in_time, e.out_time
+        FROM entrylog e
+      `;
+    } else if (userType === 2) {
+      // Vendor: Logs of devices they created
+      query = `
+        SELECT e.user_id, e.device_id, e.in_time, e.out_time
+        FROM entrylog e
+        JOIN devices d ON e.device_id = d.id
+        WHERE d.created_by = ?
       `;
       params = [userId];
     } else {
-      // Customer can only see their own logs
-      query = `SELECT * FROM entrylog WHERE user_id = ?`;
-      params = [userId];
+      // Customer: Logs from devices registered with their phone number
+      const [userRow] = await db.query(`SELECT phoneNumber FROM user_data WHERE id = ?`, [userId]);
+      if (userRow.length === 0) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      const customerPhone = userRow[0].phoneNumber;
+
+      query = `
+        SELECT e.user_id, e.device_id, e.in_time, e.out_time
+        FROM entrylog e
+        JOIN devices d ON e.device_id = d.id
+        WHERE d.phone_number = ?
+      `;
+      params = [customerPhone];
     }
 
     const [logs] = await db.query(query, params);
@@ -256,6 +271,9 @@ export const getEntry = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+
+
+
 
 
 export const registerDevice = async (req, res) => {

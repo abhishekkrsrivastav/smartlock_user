@@ -158,3 +158,62 @@ export const getImage = async (req, res) => {
 //     res.status(500).json({ error: "Server error", details: error.message });
 //   }
 // };
+
+
+
+// final 
+
+export const addUserImage = async (req, res) => {
+  try {
+    const { user_id, image_path } = req.body;
+
+    // Check if user already has an entry in user_image table
+    const [existing] = await db.query(`SELECT * FROM user_image WHERE user_id = ?`, [user_id]);
+
+    if (existing.length > 0) {
+      // If exists, update the JSON array
+      const currentImages = JSON.parse(existing[0].image_path || '[]');
+      currentImages.push(image_path);
+
+      await db.query(
+        `UPDATE user_image SET image_path = ?, created_at = NOW() WHERE user_id = ?`,
+        [JSON.stringify(currentImages), user_id]
+      );
+
+      return res.status(200).json({
+        message: "Image path added to existing user",
+        image_path: currentImages,
+      });
+
+    } else {
+      // First time entry
+      await db.query(
+        `INSERT INTO user_image (user_id, image_path) VALUES (?, ?)`,
+        [user_id, JSON.stringify([image_path])]
+      );
+
+      return res.status(201).json({
+        message: "Image path added for new user",
+        image_path: [image_path],
+      });
+    }
+
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+
+
+export const getUserImages = async (req, res) => {
+  try {
+    const { user_id } = req.params;
+    const [rows] = await db.query(`SELECT image_path FROM user_image WHERE user_id = ?`, [user_id]);
+
+    if (rows.length === 0) return res.status(404).json({ message: "No images found" });
+
+    res.status(200).json({ images: JSON.parse(rows[0].image_path) });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};

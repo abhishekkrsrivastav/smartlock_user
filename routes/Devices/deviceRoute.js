@@ -335,9 +335,190 @@ router.post("/entry", requireSignIn, logEntry);
 router.get('/get-entry', requireSignIn, getEntry);
 
 
+/**
+ * @swagger
+ * /register-device:
+ *   post:
+ *     summary: Register a new device
+ *     tags: [Devices]
+ *     security:
+ *       - bearerAuth: []
+ *     description: >
+ *       Registers a new device with a unique deviceCode.  
+ *       - Only Admin or Vendor can use this endpoint.  
+ *       - Device status is initialized as 'Inactive' (status_id: 4).
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - deviceName
+ *             properties:
+ *               deviceName:
+ *                 type: string
+ *                 example: "Front Door Sensor"
+ *     responses:
+ *       201:
+ *         description: Device registered successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Device registered successfully
+ *                 deviceCode:
+ *                   type: string
+ *                   example: XRDA3-8JDK2KDL
+ *                 deviceId:
+ *                   type: integer
+ *                   example: 17
+ *       500:
+ *         description: Server error
+ */
+
 
 router.post('/register-device', requireSignIn, registerDevice);
+
+/**
+ * @swagger
+ * /activate-device:
+ *   put:
+ *     summary: Activate a device using deviceCode
+ *     tags: [Devices]
+ *     security:
+ *       - bearerAuth: []
+ *     description: >
+ *       Activates a device by linking it to a phone number.  
+ *       - Only **Vendors** are allowed to activate devices.  
+ *       - Device status is updated to "Active" (`status_id = 3`).  
+ *       - Already activated devices cannot be activated again.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - deviceCode
+ *               - phone_number
+ *             properties:
+ *               deviceCode:
+ *                 type: string
+ *                 example: "XRDA3-8JDK2KDL"
+ *               phone_number:
+ *                 type: string
+ *                 example: "+919876543210"
+ *     responses:
+ *       200:
+ *         description: Device activated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Device activated successfully
+ *       400:
+ *         description: Device already activated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Device already activated
+ *       403:
+ *         description: Only vendors can activate devices
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Only vendors can activate devices.
+ *       404:
+ *         description: Device not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Device not found
+ *       500:
+ *         description: Server error
+ */
+
+
 router.put('/activate-device', requireSignIn, activateDevice);
+
+
+/**
+ * @swagger
+ * /my-device:
+ *   get:
+ *     summary: Get device assigned to the logged-in customer
+ *     tags: [Devices]
+ *     security:
+ *       - bearerAuth: []
+ *     description: >
+ *       Returns the device linked to the customer's phone number.  
+ *       - Only accessible to **Customers** (userType = 3).  
+ *       - Uses phone number from JWT token to fetch the device.
+ *     responses:
+ *       200:
+ *         description: Device details found for customer
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 device:
+ *                   type: object
+ *                   properties:
+ *                     deviceCode:
+ *                       type: string
+ *                       example: XRDA3-1B2C3D4E
+ *                     deviceName:
+ *                       type: string
+ *                       example: Main Gate Scanner
+ *                     status_id:
+ *                       type: integer
+ *                       example: 3
+ *       403:
+ *         description: Only customers can access this route
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Only customers can access this route
+ *       404:
+ *         description: No device found for this customer
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: No device found for your number
+ *       500:
+ *         description: Server error
+ */
 
 
 router.get('/my-device', requireSignIn, getMyDevice);

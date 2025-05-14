@@ -93,7 +93,7 @@ app.use("", subPlanRoute)
 // api for subscription
 app.use("", subscriptionRoute)
 // api for face-recognisation
-app.use("/api", faceRoute);
+app.use("", faceRoute);
 
 // routes for user
 // app.use('/api/user', userRoutes);
