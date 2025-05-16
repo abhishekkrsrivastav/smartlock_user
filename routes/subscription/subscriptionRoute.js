@@ -117,22 +117,27 @@ const router = express.Router();
 // Assign a subscription for a customer (Admin and vendor and customer)
 router.post("/assign-subscription", requireSignIn, assignSubscription)
 
-/**
+ /**
  * @swagger
  * /get-subscriptions:
  *   get:
- *     summary: Get all subscriptions (Admin, Vendor for their customers, Customer for their own subscriptions)
+ *     summary: Get subscriptions for admin, vendor, or customer
  *     tags: [Assign Subscription]
  *     security:
  *       - bearerAuth: []
  *     description: >
- *       **Role-based access:**  
- *       - **Admin:** Can get all subscriptions.  
- *       - **Vendor:** Can get subscriptions created by them (for their customers).  
- *       - **Customer:** Can get their own subscriptions.
+ *       Fetches subscriptions based on the role of the authenticated user.
+ *       
+ *       🔐 **Role-based behavior:**
+ *       
+ *       - **Admin** (userType = 1): Gets all subscriptions in the system.
+ *       - **Vendor** (userType = 2): Gets subscriptions created by this vendor.
+ *       - **Customer** (userType = 3): Gets only their own subscriptions.
+ *       
+ *       Each subscription also includes an array of associated `device_ids`.
  *     responses:
  *       200:
- *         description: Successfully fetched subscriptions
+ *         description: List of subscriptions
  *         content:
  *           application/json:
  *             schema:
@@ -148,37 +153,47 @@ router.post("/assign-subscription", requireSignIn, assignSubscription)
  *                     properties:
  *                       id:
  *                         type: integer
- *                         description: Subscription ID
  *                         example: 1
  *                       user_id:
  *                         type: integer
- *                         description: The user ID to whom the subscription is assigned
  *                         example: 3
  *                       plan_id:
  *                         type: integer
- *                         description: The subscription plan ID
- *                         example: 2
+ *                         example: 1
+ *                       remaining_tokens:
+ *                         type: integer
+ *                         example: 1000
  *                       start_date:
  *                         type: string
  *                         format: date
- *                         description: Start date of the subscription
- *                         example: "2025-05-01"
+ *                         example: "2025-05-20"
  *                       end_date:
  *                         type: string
  *                         format: date
- *                         description: End date of the subscription
- *                         example: "2026-05-01"
+ *                         example: "2025-06-20"
+ *                       created_by:
+ *                         type: integer
+ *                         example: 3
  *                       device_ids:
  *                         type: array
  *                         items:
  *                           type: integer
- *                         description: List of device IDs associated with the subscription
  *                         example: [1, 2, 3]
  *       500:
  *         description: Server error
- *       401:
- *         description: Unauthorized access (missing or invalid token)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Server error
+ *                 error:
+ *                   type: string
+ *                   example: Database connection failed
  */
+
 
 
 

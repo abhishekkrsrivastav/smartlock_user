@@ -25,14 +25,14 @@ export const createSubscriptionPlan = async (req, res) => {
     }
 }
 
-// export const getAllSubscriptionPlans = async (req, res) => {
-//     try {
-//         const [plans] = await db.query(`SELECT * FROM subscription_plans`);
-//         res.status(200).json({ success: true, plans });
-//     } catch (error) {
-//         res.status(500).json({ message: "Server error", error: error.message });
-//     }
-// };
+export const getAllSubscriptionPlans = async (req, res) => {
+    try {
+        const [plans] = await db.query(`SELECT * FROM subscription_plans`);
+        res.status(200).json({ success: true, plans });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
 
 
 // export const getSubscriptionPlanById = async (req, res) => {
