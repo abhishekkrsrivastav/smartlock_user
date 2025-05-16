@@ -195,7 +195,7 @@ router.post("/detect-intent", detectIntent);
  *             properties:
  *               action_id:
  *                 type: integer
- *                 example: 3
+ *                 example: 5
  *               user_input:
  *                 type: string
  *                 example: piche ka darvaja
