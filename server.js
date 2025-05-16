@@ -99,7 +99,7 @@ app.use("", faceRoute);
 // app.use('/api/user', userRoutes);
 
 // routes for voice command
-app.use('/api', voiceRoute)
+app.use('', voiceRoute)
 
 
 

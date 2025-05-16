@@ -3,8 +3,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const db = mysql.createPool({
-  // host: "localhost",    
-  // user: "root",          
+  // host: "31.170.162.152",    
+  // user: "webinfinity_ajitnew",          
   // password: "root@123#",  
   // database: "db",       
   host: process.env.HOST,

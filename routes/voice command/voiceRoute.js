@@ -1,5 +1,5 @@
 import express from 'express';
-import { getResponse, askKeyword, saveSentence, addData } from '../../controllers/voice command/voiceController.js';
+import { getResponse, askKeyword, saveSentence, addVoiceFlowData, getResponses, detectIntent } from '../../controllers/voice command/voiceController.js';
 
 // import {
 //     createRecord,
@@ -30,7 +30,12 @@ router.post('/save-sentence', saveSentence)
 // // new
 // router.post("/insert", insertFullIntent);
 
-router.post('/data-entry', addData);
+// router.post('/data-entry', addData);
+
+
+router.post('/voice-command', addVoiceFlowData);
+router.post("/detect-intent", detectIntent);
+router.post("/get-responses", getResponses);
 
 export default router;
 
