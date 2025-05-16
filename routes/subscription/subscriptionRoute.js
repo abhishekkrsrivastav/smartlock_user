@@ -13,6 +13,16 @@ const router = express.Router();
  *     tags: [Assign Subscription]
  *     security:
  *       - bearerAuth: []
+ *     description: >
+ *       Allows assigning a subscription plan to a user along with one or more devices.
+ *       
+ *       🔐 **Role-based access rules:**
+ *       
+ *       - **Admin** (userType = 1): Can assign to any user.
+ *       - **Vendor** (userType = 2): Can assign to customers created by themselves.
+ *       - **Customer** (userType = 3): Can assign only to themselves.
+ *       
+ *       ❌ If role restrictions are violated, a 403 Forbidden error is returned.
  *     requestBody:
  *       required: true
  *       content:
@@ -21,29 +31,33 @@ const router = express.Router();
  *             type: object
  *             required:
  *               - user_id
+ *               - device_id
  *               - plan_id
  *               - start_date
  *               - end_date
  *             properties:
  *               user_id:
  *                 type: integer
- *                 example: 12
- *               plan_id:
- *                 type: integer
  *                 example: 3
  *               device_id:
  *                 type: array
  *                 items:
  *                   type: integer
- *                 example: [101, 102, 103]
+ *                 example:
+ *                   - 1
+ *                   - 2
+ *                   - 3
+ *               plan_id:
+ *                 type: integer
+ *                 example: 1
  *               start_date:
  *                 type: string
  *                 format: date
- *                 example: "2025-05-15"
+ *                 example: "2025-05-20"
  *               end_date:
  *                 type: string
  *                 format: date
- *                 example: "2025-06-15"
+ *                 example: "2025-06-20"
  *     responses:
  *       201:
  *         description: Subscription successfully assigned
@@ -60,7 +74,7 @@ const router = express.Router();
  *                   example: Subscription assigned
  *                 id:
  *                   type: integer
- *                   example: 45
+ *                   example: 1
  *       403:
  *         description: Forbidden access due to role restrictions
  *         content:
@@ -95,6 +109,8 @@ const router = express.Router();
  *                   type: string
  *                   example: Some internal DB error message
  */
+
+
 
 
 
