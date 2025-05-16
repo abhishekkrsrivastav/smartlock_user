@@ -5,13 +5,11 @@ import { assignSubscription, deleteSubscription, getAllSubscriptions, updateSubs
 const router = express.Router();
 
 
-
-
 /**
  * @swagger
  * /assign-subscription:
  *   post:
- *     summary: Assign subscription to a customer (Admin, Vendor only for their customers)
+ *     summary: Assign a subscription plan to a user with devices
  *     tags: [Assign Subscription]
  *     security:
  *       - bearerAuth: []
@@ -23,56 +21,84 @@ const router = express.Router();
  *             type: object
  *             required:
  *               - user_id
- *               - device_id
  *               - plan_id
  *               - start_date
  *               - end_date
  *             properties:
  *               user_id:
  *                 type: integer
- *                 description: ID of the user to assign the subscription
+ *                 example: 12
+ *               plan_id:
+ *                 type: integer
  *                 example: 3
  *               device_id:
  *                 type: array
  *                 items:
  *                   type: integer
- *                 description: Array of device IDs to be assigned with the subscription
- *                 example: [1, 2, 3]
- *               plan_id:
- *                 type: integer
- *                 description: ID of the subscription plan to assign
- *                 example: 2
+ *                 example: [101, 102, 103]
  *               start_date:
  *                 type: string
  *                 format: date
- *                 description: Start date of the subscription
- *                 example: "2025-05-01"
+ *                 example: "2025-05-15"
  *               end_date:
  *                 type: string
  *                 format: date
- *                 description: End date of the subscription
- *                 example: "2026-05-01"
- *     description: >
- *       **Role-based access:**  
- *       - **Admin:** Can assign any subscription to any user.  
- *       - **Vendor:** Can assign subscription only to their own customers.  
- *       - **Customer:** ❌ Not allowed to assign subscriptions.
+ *                 example: "2025-06-15"
  *     responses:
  *       201:
- *         description: Subscription assigned successfully
- *       400:
- *         description: Missing required fields
+ *         description: Subscription successfully assigned
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Subscription assigned
+ *                 id:
+ *                   type: integer
+ *                   example: 45
  *       403:
- *         description: Not authorized to assign subscription
+ *         description: Forbidden access due to role restrictions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Customers can only assign subscriptions to themselves
  *       404:
- *         description: Plan not found or customer not found
+ *         description: Plan not found or invalid user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Plan not found
  *       500:
- *         description: Internal server error
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Server error
+ *                 error:
+ *                   type: string
+ *                   example: Some internal DB error message
  */
 
 
 
-// Assign a subscription for a customer (Admin and vendor)
+// Assign a subscription for a customer (Admin and vendor and customer)
 router.post("/assign-subscription", requireSignIn, assignSubscription)
 
 /**

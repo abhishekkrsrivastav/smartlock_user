@@ -1,6 +1,6 @@
 import db from '../../config/db.js'
 
- 
+
 
 // assign subscription to customer 
 export const assignSubscription = async (req, res) => {
@@ -9,9 +9,14 @@ export const assignSubscription = async (req, res) => {
     const creatorId = req.user.id;
     const userType = req.user.userType;
 
-    if (userType === 3) {
-      return res.status(403).json({ message: "Customers cannot assign subscriptions" });
+    // if (userType === 3) {
+    //   return res.status(403).json({ message: "Customers cannot assign subscriptions" });
+    // }
+
+    if (userType === 3 && user_id !== req.user.id) {
+      return res.status(403).json({ message: "Customers can only assign subscriptions to themselves" });
     }
+
 
     if (userType === 2) {
       const [customer] = await db.query(
@@ -57,43 +62,43 @@ export const assignSubscription = async (req, res) => {
 // get details of subscription
 
 export const getAllSubscriptions = async (req, res) => {
-    const userId = req.user.id;
-    const userType = req.user.userType;
+  const userId = req.user.id;
+  const userType = req.user.userType;
 
-    try {
-        let query = "";
-        let params = [];
+  try {
+    let query = "";
+    let params = [];
 
-        if (userType === 1) {
-            // Admin: get all subscriptions
-            query = `SELECT * FROM subscriptions`;
-        } else if (userType === 2) {
-            // Vendor: get subscriptions created by this vendor
-            query = `SELECT * FROM subscriptions WHERE created_by = ?`;
-            params = [userId];
-        } else {
-            // Customer: get own subscriptions
-            query = `SELECT * FROM subscriptions WHERE user_id = ?`;
-            params = [userId];
-        }
-
-        const [subs] = await db.query(query, params);
-
-        // Now, for each subscription, get its device_ids
-        for (let sub of subs) {
-            const [devices] = await db.query(
-                `SELECT device_id FROM subscription_devices WHERE subscription_id = ?`,
-                [sub.id]
-            );
-            sub.device_ids = devices.map(d => d.device_id);
-        }
-
-        res.status(200).json({ success: true, subscriptions: subs });
-
-    } catch (error) {
-        console.error("getAllSubscriptions error:", error);
-        res.status(500).json({ message: "Server error", error: error.message });
+    if (userType === 1) {
+      // Admin: get all subscriptions
+      query = `SELECT * FROM subscriptions`;
+    } else if (userType === 2) {
+      // Vendor: get subscriptions created by this vendor
+      query = `SELECT * FROM subscriptions WHERE created_by = ?`;
+      params = [userId];
+    } else {
+      // Customer: get own subscriptions
+      query = `SELECT * FROM subscriptions WHERE user_id = ?`;
+      params = [userId];
     }
+
+    const [subs] = await db.query(query, params);
+
+    // Now, for each subscription, get its device_ids
+    for (let sub of subs) {
+      const [devices] = await db.query(
+        `SELECT device_id FROM subscription_devices WHERE subscription_id = ?`,
+        [sub.id]
+      );
+      sub.device_ids = devices.map(d => d.device_id);
+    }
+
+    res.status(200).json({ success: true, subscriptions: subs });
+
+  } catch (error) {
+    console.error("getAllSubscriptions error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
 };
 
 
@@ -121,35 +126,35 @@ export const getAllSubscriptions = async (req, res) => {
 // };
 
 export const deleteSubscription = async (req, res) => {
-    try {
-        const subscriptionId = req.params.id;
-        const creatorId = req.user.id;
-        const userType = req.user.userType;
+  try {
+    const subscriptionId = req.params.id;
+    const creatorId = req.user.id;
+    const userType = req.user.userType;
 
-        const [subscription] = await db.query(
-            `SELECT * FROM subscriptions WHERE id = ? AND (created_by = ? OR user_id = ?)`,
-            [subscriptionId, creatorId, creatorId]
-        );
+    const [subscription] = await db.query(
+      `SELECT * FROM subscriptions WHERE id = ? AND (created_by = ? OR user_id = ?)`,
+      [subscriptionId, creatorId, creatorId]
+    );
 
-        if (subscription.length === 0) {
-            return res.status(404).json({ message: "Subscription not found" });
-        }
-
-        if (userType === 2 && subscription[0].created_by !== creatorId) {
-            return res.status(403).json({ message: "Vendors can only delete their own customers' subscriptions" });
-        }
-
-        // Step 1: Delete devices mapping
-        await db.query(`DELETE FROM subscription_devices WHERE subscription_id = ?`, [subscriptionId]);
-
-        // Step 2: Delete the subscription itself
-        await db.query(`DELETE FROM subscriptions WHERE id = ?`, [subscriptionId]);
-
-        res.status(200).json({ success: true, message: "Subscription deleted successfully" });
-
-    } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+    if (subscription.length === 0) {
+      return res.status(404).json({ message: "Subscription not found" });
     }
+
+    if (userType === 2 && subscription[0].created_by !== creatorId) {
+      return res.status(403).json({ message: "Vendors can only delete their own customers' subscriptions" });
+    }
+
+    // Step 1: Delete devices mapping
+    await db.query(`DELETE FROM subscription_devices WHERE subscription_id = ?`, [subscriptionId]);
+
+    // Step 2: Delete the subscription itself
+    await db.query(`DELETE FROM subscriptions WHERE id = ?`, [subscriptionId]);
+
+    res.status(200).json({ success: true, message: "Subscription deleted successfully" });
+
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
 };
 
 
