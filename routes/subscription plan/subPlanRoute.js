@@ -1,7 +1,7 @@
  
 import express from 'express';
 import { requireSignIn } from '../../middleware/smartLock/requireSignIn.js';
-import { createSubscriptionPlan, getAllSubscriptionPlans } from '../../controllers/subscription Plan/subPlanController.js';
+import { createSubscriptionPlan, deleteSubscriptionPlan, getAllSubscriptionPlans, updateSubscriptionPlan } from '../../controllers/subscription Plan/subPlanController.js';
  
 const router = express.Router();
 
@@ -122,11 +122,162 @@ router.get('/get-subscription', requireSignIn, getAllSubscriptionPlans);
 // // Get a specific subscription plan by ID
 // router.get('/:id', requireSignIn, getSubscriptionPlanById);
 
+
+/**
+ * @swagger
+ * /update-subscription/{id}:
+ *   put:
+ *     summary: Update a subscription plan (Admin only)
+ *     tags: [Subscription Plan]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the subscription plan to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - plan_name
+ *               - token_limit
+ *               - price
+ *             properties:
+ *               plan_name:
+ *                 type: string
+ *                 example: Basic Plan
+ *               token_limit:
+ *                 type: integer
+ *                 example: 1000
+ *               price:
+ *                 type: string
+ *                 example: "400"
+ *     responses:
+ *       200:
+ *         description: Subscription Plan updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Subscription Plan updated successfully
+ *       403:
+ *         description: Forbidden - Only admin can update
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Only admin can update subscription plans
+ *       404:
+ *         description: Subscription Plan not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Subscription Plan not found
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Server error
+ *                 error:
+ *                   type: string
+ *                   example: Some DB error message
+ */
+
+
 // // Update a subscription plan
-// router.put('/:id', requireSignIn, updateSubscriptionPlan);
+router.put('/update-subscription/:id', requireSignIn, updateSubscriptionPlan);
+
+/**
+ * @swagger
+ * /delete-subscription/{id}:
+ *   delete:
+ *     summary: Delete a subscription plan (Admin only)
+ *     tags: [Subscription Plan]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the subscription plan to delete
+ *     responses:
+ *       200:
+ *         description: Subscription Plan deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Subscription Plan deleted successfully
+ *       403:
+ *         description: Forbidden - Only admin can delete
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Only admin can delete subscription plans
+ *       404:
+ *         description: Subscription Plan not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Subscription Plan not found
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Server error
+ *                 error:
+ *                   type: string
+ *                   example: Some DB error message
+ */
+
 
 // // Delete a subscription plan
-// router.delete('/:id', requireSignIn, deleteSubscriptionPlan);
+router.delete('/delete-subscription/:id', requireSignIn, deleteSubscriptionPlan);
 
 export default router;
 

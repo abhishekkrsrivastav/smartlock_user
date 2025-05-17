@@ -29,7 +29,7 @@ const options = {
     openapi: "3.0.4",
     info: {
       title: "SmartLock Project",
-      description: "API's Documentation for SmartLock Project"
+      description: "API's Documentation for SmartLock Project by ABHISHEK SRIVASTAV"
     },
     components: {
       securitySchemes: {

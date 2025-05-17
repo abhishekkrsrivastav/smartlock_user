@@ -171,9 +171,9 @@ export const updateSubscription = async (req, res) => {
     const userType = req.user.userType;
     const requesterId = req.user.id;
 
-    if (userType === 3) {
-      return res.status(403).json({ message: "Customers are not allowed to update subscriptions" });
-    }
+    // if (userType === 3) {
+    //   return res.status(403).json({ message: "Customers are not allowed to update subscriptions" });
+    // }
 
     if (userType === 2) {
       const [customer] = await db.query(
