@@ -4,16 +4,23 @@ import db from "../../config/db.js"; // adjust the path based on your structure
 export const addAIService = async (req, res) => {
   try {
     const { serviceName, serviceDescription } = req.body;
+ 
+    if (req.user.userType !== 1) {
+      return res.status(403).json({ message: "Only admin can create AI services" });
+    }
+
     await db.query(
       "INSERT INTO ai_services (service_name, service_description) VALUES (?, ?)",
       [serviceName, serviceDescription]
     );
+
     res.status(201).json({ message: "AI service created successfully" });
   } catch (error) {
     console.error("Error creating AI service:", error);
     res.status(500).json({ error: "Server error" });
   }
 };
+
 
 // Read All Services
 export const getAllAIServices = async (req, res) => {
