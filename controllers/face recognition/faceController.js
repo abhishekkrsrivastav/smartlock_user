@@ -332,22 +332,82 @@ export const AllGuestImages = async (req, res) => {
 
 
 
- 
-// Add location and message
-export const addLocationData = (req, res) => {
-    const { location, message } = req.body;
-console.log(req.body);
+// export const addLocationData = (req, res) => {
+//   const { user_id, latitude, longitude } = req.body;
 
-    if (!location || !message) {
-        return res.status(400).json({ error: 'Location and message are required' });
+//   console.log("Received body:", req.body);  // Debug
+
+//   if (!user_id || latitude === undefined || longitude === undefined) {
+//     return res.status(400).json({ error: 'user_id, latitude, and longitude are required' });
+//   }
+
+//   // Use 'id' for ordering now
+//   const lastLocationQuery = `
+//     SELECT latitude, longitude 
+//     FROM user_locations 
+//     WHERE user_id = ? 
+//     ORDER BY id DESC 
+//     LIMIT 1
+//   `;
+
+//   db.query(lastLocationQuery, [user_id], (err, results) => {
+//     if (err) {
+//       console.error('Fetch Error:', err);
+//       return res.status(500).json({ error: 'Internal Server Error' });
+//     }
+
+//     const last = results[0];
+
+//    const isSameLocation =
+//   last &&
+//   Number(last.latitude).toFixed(6) === Number(latitude).toFixed(6) &&
+//   Number(last.longitude).toFixed(6) === Number(longitude).toFixed(6);
+// console.log("Last location from DB:", last);
+// console.log("Current location:", { latitude, longitude });
+// console.log("Comparison Result:", isSameLocation);
+
+
+//     if (isSameLocation) {
+//       return res.status(200).json({ message: 'Location not changed. Skipping insert.' });
+//     }
+
+//     const insertQuery = `
+//       INSERT INTO user_locations (user_id, latitude, longitude)
+//       VALUES (?, ?, ?)
+//     `;
+
+//     db.query(insertQuery, [user_id, latitude, longitude], (err, result) => {
+//       if (err) {
+//         console.error('Insert Error:', err);
+//         return res.status(500).json({ error: 'Internal Server Error' });
+//       }
+
+//       res.status(201).json({ id: result.insertId });
+//     });
+//   });
+// };
+
+
+export const addLocationData = async(req, res) => {
+  const { user_id, latitude, longitude } = req.body;
+
+  if (!user_id || latitude === undefined || longitude === undefined) {
+    return res.status(400).json({ error: 'user_id, latitude, and longitude are required' });
+  }
+
+
+  const insertQuery = `
+    INSERT INTO user_locations (user_id, latitude, longitude)
+    VALUES (?, ?, ?)
+  `;
+ await db.query(insertQuery, [user_id, latitude, longitude], (err, result) => {
+    if (err) {
+      console.error('Insert Error:', err);   
+      return res.status(500).json({ error: 'Insert failed' });
     }
 
-    const query = 'INSERT INTO location_data (location, message) VALUES (?, ?)';
-    db.query(query, [location, message], (err, result) => {
-        if (err) {
-            console.error('DB Insert Error:', err);
-            return res.status(500).json({ error: 'Internal server error' });
-        }
-        res.status(201).json({ message: 'Location data added successfully', id: result.insertId });
-    });
+    res.status(201).json({ id: result.insertId });
+  });
 };
+
+
