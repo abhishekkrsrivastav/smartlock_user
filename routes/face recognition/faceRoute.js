@@ -1,5 +1,5 @@
 import express from "express";
-import { AllGuestImages, guestInWithImage } from "../../controllers/face recognition/faceController.js";
+import { addLocationData, AllGuestImages, guestInWithImage } from "../../controllers/face recognition/faceController.js";
 // import { addUserImage, getAllUserImages, getImage, getUserByImagePath,   getUserImages,   saveImagePath } from "../../controllers/face recognition/faceController.js";
  
 
@@ -124,6 +124,11 @@ router.get("/allguestimages", AllGuestImages);
  */
 
 
+
+
+
+// remove this api 
+router.post('/add-location',  addLocationData);
 
 export default router;
 

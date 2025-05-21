@@ -327,3 +327,27 @@ export const AllGuestImages = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+
+
+
+
+
+ 
+// Add location and message
+export const addLocationData = (req, res) => {
+    const { location, message } = req.body;
+console.log(req.body);
+
+    if (!location || !message) {
+        return res.status(400).json({ error: 'Location and message are required' });
+    }
+
+    const query = 'INSERT INTO location_data (location, message) VALUES (?, ?)';
+    db.query(query, [location, message], (err, result) => {
+        if (err) {
+            console.error('DB Insert Error:', err);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+        res.status(201).json({ message: 'Location data added successfully', id: result.insertId });
+    });
+};
