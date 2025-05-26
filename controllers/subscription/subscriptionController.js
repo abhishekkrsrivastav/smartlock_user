@@ -3,20 +3,70 @@ import db from '../../config/db.js'
 
 
 // assign subscription to customer 
+// export const assignSubscription = async (req, res) => {
+//   try {
+//     const { user_id, device_id, plan_id, start_date, end_date } = req.body; // device_id is an array
+//     const creatorId = req.user.id;
+//     const userType = req.user.userType;
+
+//     // if (userType === 3) {
+//     //   return res.status(403).json({ message: "Customers cannot assign subscriptions" });
+//     // }
+
+//     if (userType === 3 && user_id !== req.user.id) {
+//       return res.status(403).json({ message: "Customers can only assign subscriptions to themselves" });
+//     }
+
+
+//     if (userType === 2) {
+//       const [customer] = await db.query(
+//         `SELECT * FROM user_data WHERE id = ? AND created_by = ?`,
+//         [user_id, creatorId]
+//       );
+//       if (customer.length === 0) {
+//         return res.status(403).json({ message: "Vendors can assign to their own customers only" });
+//       }
+//     }
+
+//     const [plan] = await db.query(`SELECT * FROM subscription_plans WHERE id = ?`, [plan_id]);
+//     if (plan.length === 0) {
+//       return res.status(404).json({ message: "Plan not found" });
+//     }
+
+//     // 1. Insert subscription
+//     const [result] = await db.query(
+//       `INSERT INTO subscriptions (user_id, plan_id, remaining_tokens, start_date, end_date, created_by)
+//        VALUES (?, ?, ?, ?, ?, ?)`,
+//       [user_id, plan_id, plan[0].token_limit, start_date, end_date, creatorId]
+//     );
+
+//     const subscriptionId = result.insertId;
+
+//     // 2. Insert device mapping into subscription_devices
+//     if (Array.isArray(device_id) && device_id.length > 0) {
+//       const values = device_id.map(deviceId => [subscriptionId, deviceId]);
+//       await db.query(
+//         `INSERT INTO subscription_devices (subscription_id, device_id) VALUES ?`,
+//         [values]
+//       );
+//     }
+
+//     res.status(201).json({ success: true, message: "Subscription assigned", id: subscriptionId });
+//   } catch (err) {
+//     console.error("Subscription assign error:", err);
+//     res.status(500).json({ message: "Server error", error: err.message });
+//   }
+// };
+
 export const assignSubscription = async (req, res) => {
   try {
-    const { user_id, device_id, plan_id, start_date, end_date } = req.body; // device_id is an array
+    const { user_id, device_id, plan_id, start_date, end_date } = req.body;
     const creatorId = req.user.id;
     const userType = req.user.userType;
-
-    // if (userType === 3) {
-    //   return res.status(403).json({ message: "Customers cannot assign subscriptions" });
-    // }
 
     if (userType === 3 && user_id !== req.user.id) {
       return res.status(403).json({ message: "Customers can only assign subscriptions to themselves" });
     }
-
 
     if (userType === 2) {
       const [customer] = await db.query(
@@ -33,16 +83,21 @@ export const assignSubscription = async (req, res) => {
       return res.status(404).json({ message: "Plan not found" });
     }
 
-    // 1. Insert subscription
+   
+    await db.query(
+      `UPDATE subscriptions SET status_id = 4 WHERE user_id = ? AND status_id = 3`,
+      [user_id]
+    );
+ 
     const [result] = await db.query(
-      `INSERT INTO subscriptions (user_id, plan_id, remaining_tokens, start_date, end_date, created_by)
-       VALUES (?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO subscriptions (user_id, plan_id, remaining_tokens, start_date, end_date, created_by, status_id)
+       VALUES (?, ?, ?, ?, ?, ?, 3)`,
       [user_id, plan_id, plan[0].token_limit, start_date, end_date, creatorId]
     );
 
     const subscriptionId = result.insertId;
 
-    // 2. Insert device mapping into subscription_devices
+ 
     if (Array.isArray(device_id) && device_id.length > 0) {
       const values = device_id.map(deviceId => [subscriptionId, deviceId]);
       await db.query(
@@ -51,7 +106,7 @@ export const assignSubscription = async (req, res) => {
       );
     }
 
-    res.status(201).json({ success: true, message: "Subscription assigned", id: subscriptionId });
+    res.status(201).json({ success: true, message: "Subscription assigned successfully", id: subscriptionId });
   } catch (err) {
     console.error("Subscription assign error:", err);
     res.status(500).json({ message: "Server error", error: err.message });

@@ -9,7 +9,7 @@ const router = express.Router();
  * @swagger
  * /assign-subscription:
  *   post:
- *     summary: Assign a subscription plan to a user with devices
+ *     summary: Assign / Renew / Upgrade a subscription plan to a user with devices
  *     tags: [Assign Subscription]
  *     security:
  *       - bearerAuth: []
@@ -174,6 +174,9 @@ router.post("/assign-subscription", requireSignIn, assignSubscription)
 *                       created_by:
 *                         type: integer
 *                         example: 3
+ *                       status_id:
+ *                         type: integer
+ *                         example: 3
 *                       device_ids:
 *                         type: array
 *                         items:
