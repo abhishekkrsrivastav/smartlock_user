@@ -1,16 +1,18 @@
 import db from '../../config/db.js'
-
+import dayjs from 'dayjs';
 
 
 // assign subscription to customer 
 
 export const assignSubscription = async (req, res) => {
   try {
-    const { user_id, device_id, plan_id, start_date, end_date } = req.body;
+    const { device_id, plan_id } = req.body;
     const creatorId = req.user.id;
     const userType = req.user.userType;
 
-    if (userType === 3 && user_id !== req.user.id) {
+    const user_id = req.body.user_id || req.user.id;
+
+    if (userType === 3 && req.user.id !== user_id) {
       return res.status(403).json({ message: "Customers can only assign subscriptions to themselves" });
     }
 
@@ -35,6 +37,10 @@ export const assignSubscription = async (req, res) => {
       [user_id]
     );
 
+    const now = dayjs();
+    const start_date = now.format("YYYY-MM-DD HH:mm:ss");
+    const end_date = now.add(plan[0].validity_days, 'day').format("YYYY-MM-DD HH:mm:ss");
+
     const [result] = await db.query(
       `INSERT INTO subscriptions (user_id, plan_id, remaining_tokens, start_date, end_date, created_by, status_id)
        VALUES (?, ?, ?, ?, ?, ?, 3)`,
@@ -52,7 +58,7 @@ export const assignSubscription = async (req, res) => {
       );
     }
 
-    res.status(201).json({ success: true, message: "Subscription assigned successfully", id: subscriptionId });
+    res.status(201).json({ success: true, message: "Subscription assigned successfully", id: subscriptionId, start_date, end_date });
   } catch (err) {
     console.error("Subscription assign error:", err);
     res.status(500).json({ message: "Server error", error: err.message });
@@ -113,7 +119,7 @@ export const deleteSubscription = async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Subscription not found or unauthorized" });
     }
-    
+
     res.status(200).json({
       success: true,
       message: "Subscription deleted successfully"

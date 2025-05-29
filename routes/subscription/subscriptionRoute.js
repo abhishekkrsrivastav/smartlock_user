@@ -9,20 +9,10 @@ const router = express.Router();
  * @swagger
  * /assign-subscription:
  *   post:
- *     summary: Assign / Renew / Upgrade a subscription plan to a user with devices
+ *     summary: Assign, Renew or Upgrade a Subscription (Admin/Vendor/Customer)
  *     tags: [Assign Subscription]
  *     security:
  *       - bearerAuth: []
- *     description: >
- *       Allows assigning a subscription plan to a user along with one or more devices.
- *       
- *       🔐 **Role-based access rules:**
- *       
- *       - **Admin** (userType = 1): Can assign to any user.
- *       - **Vendor** (userType = 2): Can assign to customers created by themselves.
- *       - **Customer** (userType = 3): Can assign only to themselves.
- *       
- *       ❌ If role restrictions are violated, a 403 Forbidden error is returned.
  *     requestBody:
  *       required: true
  *       content:
@@ -30,37 +20,25 @@ const router = express.Router();
  *           schema:
  *             type: object
  *             required:
- *               - user_id
- *               - device_id
  *               - plan_id
- *               - start_date
- *               - end_date
+ *               - device_id
  *             properties:
  *               user_id:
  *                 type: integer
+ *                 description: Optional for Admin/Vendor. For customer, it's auto-taken from token.
  *                 example: 3
+ *               plan_id:
+ *                 type: integer
+ *                 description: Subscription plan to assign
+ *                 example: 5
  *               device_id:
  *                 type: array
  *                 items:
  *                   type: integer
- *                 example:
- *                   - 1
- *                   - 2
- *                   - 3
- *               plan_id:
- *                 type: integer
- *                 example: 1
- *               start_date:
- *                 type: string
- *                 format: date
- *                 example: "2025-05-20"
- *               end_date:
- *                 type: string
- *                 format: date
- *                 example: "2025-06-20"
+ *                 example: [7, 8]
  *     responses:
  *       201:
- *         description: Subscription successfully assigned
+ *         description: Subscription assigned successfully (new/renewed/upgraded)
  *         content:
  *           application/json:
  *             schema:
@@ -71,12 +49,18 @@ const router = express.Router();
  *                   example: true
  *                 message:
  *                   type: string
- *                   example: Subscription assigned
+ *                   example: Subscription assigned successfully
  *                 id:
  *                   type: integer
- *                   example: 1
+ *                   example: 2
+ *                 start_date:
+ *                   type: string
+ *                   example: "2025-05-29 17:58:06"
+ *                 end_date:
+ *                   type: string
+ *                   example: "2025-06-28 17:58:06"
  *       403:
- *         description: Forbidden access due to role restrictions
+ *         description: Forbidden (customer assigning to others, or vendor assigning to non-owned user)
  *         content:
  *           application/json:
  *             schema:
@@ -86,7 +70,7 @@ const router = express.Router();
  *                   type: string
  *                   example: Customers can only assign subscriptions to themselves
  *       404:
- *         description: Plan not found or invalid user
+ *         description: Plan not found
  *         content:
  *           application/json:
  *             schema:
@@ -96,7 +80,7 @@ const router = express.Router();
  *                   type: string
  *                   example: Plan not found
  *       500:
- *         description: Server error
+ *         description: Internal server error
  *         content:
  *           application/json:
  *             schema:
@@ -107,9 +91,8 @@ const router = express.Router();
  *                   example: Server error
  *                 error:
  *                   type: string
- *                   example: Some internal DB error message
+ *                   example: Detailed error message
  */
-
 
 
 
@@ -117,86 +100,66 @@ const router = express.Router();
 // Assign a subscription for a customer (Admin and vendor and customer)
 router.post("/assign-subscription", requireSignIn, assignSubscription)
 
-/**
-* @swagger
-* /get-subscriptions:
-*   get:
-*     summary: Get subscriptions for admin, vendor, or customer
-*     tags: [Assign Subscription]
-*     security:
-*       - bearerAuth: []
-*     description: >
-*       Fetches subscriptions based on the role of the authenticated user.
-*       
-*       🔐 **Role-based behavior:**
-*       
-*       - **Admin** (userType = 1): Gets all subscriptions in the system.
-*       - **Vendor** (userType = 2): Gets subscriptions created by this vendor.
-*       - **Customer** (userType = 3): Gets only their own subscriptions.
-*       
-*       Each subscription also includes an array of associated `device_ids`.
-*     responses:
-*       200:
-*         description: List of subscriptions
-*         content:
-*           application/json:
-*             schema:
-*               type: object
-*               properties:
-*                 success:
-*                   type: boolean
-*                   example: true
-*                 subscriptions:
-*                   type: array
-*                   items:
-*                     type: object
-*                     properties:
-*                       id:
-*                         type: integer
-*                         example: 1
-*                       user_id:
-*                         type: integer
-*                         example: 3
-*                       plan_id:
-*                         type: integer
-*                         example: 1
-*                       remaining_tokens:
-*                         type: integer
-*                         example: 1000
-*                       start_date:
-*                         type: string
-*                         format: date
-*                         example: "2025-05-20"
-*                       end_date:
-*                         type: string
-*                         format: date
-*                         example: "2025-06-20"
-*                       created_by:
-*                         type: integer
-*                         example: 3
+ /**
+ * @swagger
+ * /get-subscriptions:
+ *   get:
+ *     summary: Get all subscriptions ( Admin, Vendor, Customer)
+ *     tags: [Assign Subscription]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of subscriptions based on user role
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 subscriptions:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 12
+ *                       user_id:
+ *                         type: integer
+ *                         example: 3
+ *                       plan_id:
+ *                         type: integer
+ *                         example: 5
+ *                       remaining_tokens:
+ *                         type: integer
+ *                         example: 450
+ *                       start_date:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2025-05-29T12:28:06.000Z"
+ *                       end_date:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2025-06-28T12:28:06.000Z"
+ *                       created_by:
+ *                         type: integer
+ *                         example: 3
  *                       status_id:
  *                         type: integer
  *                         example: 3
-*                       device_ids:
-*                         type: array
-*                         items:
-*                           type: integer
-*                         example: [1, 2, 3]
-*       500:
-*         description: Server error
-*         content:
-*           application/json:
-*             schema:
-*               type: object
-*               properties:
-*                 message:
-*                   type: string
-*                   example: Server error
-*                 error:
-*                   type: string
-*                   example: Database connection failed
-*/
-
+ *                       device_ids:
+ *                         type: array
+ *                         items:
+ *                           type: integer
+ *                         example: [1, 2]
+ *       401:
+ *         description: Unauthorized - missing or invalid token
+ *       500:
+ *         description: Server error
+ */
 
 
 

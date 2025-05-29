@@ -2,16 +2,20 @@ import db from '../../config/db.js'
 
 export const createSubscriptionPlan = async (req, res) => {
     try {
-        const { plan_name, token_limit, price } = req.body;
+        const { plan_name, token_limit, price, validity_days } = req.body;
 
-        if (!plan_name || !token_limit || !price) {
+        if (!plan_name || !token_limit || !price || !validity_days) {
             return res.status(400).json({ error: "All fields are required" });
+        }
+
+        if (req.user.userType === 3) {
+            return res.status(403).json({ error: "Customers are not allowed to create plans" });
         }
 
         const created_by = req.user.id;
 
-        const [result] = await db.query(`insert into subscription_plans(plan_name, token_limit, price, created_by) values (?, ?, ?, ?)`,
-            [plan_name, token_limit, price, created_by]);
+        const [result] = await db.query(`insert into subscription_plans(plan_name, token_limit, price, validity_days, created_by) values (?, ?, ?, ?, ?)`,
+            [plan_name, token_limit, price, validity_days, created_by]);
 
         res.status(201).json({
             success: true,

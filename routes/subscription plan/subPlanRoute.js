@@ -5,11 +5,11 @@ import { createSubscriptionPlan, deleteSubscriptionPlan, getAllSubscriptionPlans
  
 const router = express.Router();
 
- /**
+/**
  * @swagger
  * /add-subscription:
  *   post:
- *     summary: Create a new subscription plan (Admin, Vendor only)
+ *     summary: Create a new subscription plan (Admin/Vendor only)
  *     tags: [Subscription Plan]
  *     security:
  *       - bearerAuth: []
@@ -23,36 +23,79 @@ const router = express.Router();
  *               - plan_name
  *               - token_limit
  *               - price
+ *               - validity_days
  *             properties:
  *               plan_name:
  *                 type: string
- *                 example: Basic Plan
+ *                 example: "Pro Plan"
  *               token_limit:
  *                 type: integer
- *                 example: 1000
+ *                 example: 5000
  *               price:
  *                 type: number
  *                 format: integer
- *                 example: 500
- *     description: >
- *       **Role-based access:**  
- *       - **Admin:** Can create any plan.  
- *       - **Vendor:** Can create plans for their own customers.  
- *       - **Customer:** ❌ Cannot create plans.
+ *                 example: 999
+ *               validity_days:
+ *                 type: integer
+ *                 example: 30
  *     responses:
  *       201:
- *         description: New Subscription Plan added successfully
+ *         description: New subscription plan created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: New Subscription Plan added successfully
+ *                 id:
+ *                   type: integer
+ *                   example: 1
  *       400:
- *         description: Missing required fields
+ *         description: Missing or invalid fields
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: All fields are required
+ *       403:
+ *         description: Customers are not allowed to create plans
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Customers are not allowed to create plans
  *       500:
  *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Server error
+ *                 details:
+ *                   type: string
+ *                   example: Some internal error message
  */
+
  
 
 // Create a new subscription plan (Admin)
 router.post('/add-subscription', requireSignIn, createSubscriptionPlan);
 
-/**
+ /**
  * @swagger
  * /get-subscription:
  *   get:
@@ -60,13 +103,9 @@ router.post('/add-subscription', requireSignIn, createSubscriptionPlan);
  *     tags: [Subscription Plan]
  *     security:
  *       - bearerAuth: []
- *     description: >
- *       Returns a list of all available subscription plans. 
- *       
- *       🔐 Only accessible to authenticated users.
  *     responses:
  *       200:
- *         description: List of subscription plans
+ *         description: List of all available subscription plans
  *         content:
  *           application/json:
  *             schema:
@@ -82,36 +121,27 @@ router.post('/add-subscription', requireSignIn, createSubscriptionPlan);
  *                     properties:
  *                       id:
  *                         type: integer
- *                         example: 1
+ *                         example: 5
  *                       plan_name:
  *                         type: string
- *                         example: Basic Plan
+ *                         example: "XRDA3 Plan"
  *                       token_limit:
  *                         type: integer
- *                         example: 1000
+ *                         example: 1500
  *                       price:
- *                         type: string
- *                         example: "500.00"
+ *                         type: number
+ *                         format: integer
+ *                         example: 299 
+ *                       validity_days:
+ *                         type: integer
+ *                         example: 90
  *                       created_by:
  *                         type: integer
  *                         example: 1
- *                       created_at:
- *                         type: string
- *                         format: date-time
- *                         example: "2025-05-08T07:10:55.000Z"
+ *       401:
+ *         description: Unauthorized - Token required
  *       500:
  *         description: Server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Server error
- *                 error:
- *                   type: string
- *                   example: Something went wrong while fetching subscription plans
  */
 
 
