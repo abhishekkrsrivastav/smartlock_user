@@ -153,11 +153,11 @@ router.get('/get-subscription', requireSignIn, getAllSubscriptionPlans);
 // router.get('/:id', requireSignIn, getSubscriptionPlanById);
 
 
-/**
+ /**
  * @swagger
  * /update-subscription/{id}:
  *   put:
- *     summary: Update a subscription plan (Admin only)
+ *     summary: Update an existing subscription plan
  *     tags: [Subscription Plan]
  *     security:
  *       - bearerAuth: []
@@ -178,19 +178,24 @@ router.get('/get-subscription', requireSignIn, getAllSubscriptionPlans);
  *               - plan_name
  *               - token_limit
  *               - price
+ *               - validity_days
  *             properties:
  *               plan_name:
  *                 type: string
- *                 example: Basic Plan
+ *                 example: "Updated Premium Plan"
  *               token_limit:
  *                 type: integer
- *                 example: 1000
+ *                 example: 2000
  *               price:
- *                 type: string
- *                 example: "400"
+ *                 type: number
+ *                 format: integer
+ *                 example: 399
+ *               validity_days:
+ *                 type: integer
+ *                 example: 120
  *     responses:
  *       200:
- *         description: Subscription Plan updated successfully
+ *         description: Subscription plan updated successfully
  *         content:
  *           application/json:
  *             schema:
@@ -203,39 +208,13 @@ router.get('/get-subscription', requireSignIn, getAllSubscriptionPlans);
  *                   type: string
  *                   example: Subscription Plan updated successfully
  *       403:
- *         description: Forbidden - Only admin can update
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Only admin can update subscription plans
+ *         description: Only admin can update subscription plans
  *       404:
  *         description: Subscription Plan not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Subscription Plan not found
  *       500:
  *         description: Server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Server error
- *                 error:
- *                   type: string
- *                   example: Some DB error message
  */
+
 
 
 // // Update a subscription plan

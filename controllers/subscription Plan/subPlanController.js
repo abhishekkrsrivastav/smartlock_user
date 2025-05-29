@@ -58,7 +58,7 @@ export const getAllSubscriptionPlans = async (req, res) => {
 
 export const updateSubscriptionPlan = async (req, res) => {
     const planId = req.params.id;
-    const { plan_name, token_limit, price } = req.body;
+    const { plan_name, token_limit, price, validity_days } = req.body;
 
     const userType = req.user.userType;
 
@@ -73,8 +73,8 @@ export const updateSubscriptionPlan = async (req, res) => {
         }
 
         await db.query(
-            `UPDATE subscription_plans SET plan_name = ?, token_limit = ?, price = ? WHERE id = ?`,
-            [plan_name, token_limit, price, planId]
+            `UPDATE subscription_plans SET plan_name = ?, token_limit = ?, price = ?, validity_days = ? WHERE id = ?`,
+            [plan_name, token_limit, price, validity_days, planId]
         );
 
         res.status(200).json({ success: true, message: "Subscription Plan updated successfully" });
